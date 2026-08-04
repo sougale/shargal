@@ -26,7 +26,11 @@ async function start() {
 
       // Body handling (for POST/PUT etc.)
       let body;
-      if (req.method !== "GET" && req.method !== "HEAD" && req.method !== "OPTIONS") {
+      if (
+        req.method !== "GET" &&
+        req.method !== "HEAD" &&
+        req.method !== "OPTIONS"
+      ) {
         body = Readable.toWeb(req);
       }
 

@@ -1037,8 +1037,13 @@ function contactFormSubmission(data: ContactData): EmailTemplateResult {
    (Different design + text, always sent to support@sharjahbiennial.online)
    ============================================ */
 
+// Safe string interpolator to avoid "undefined" in emails
+const safe = (v: any, fallback = "—"): string =>
+  v != null && v !== "" ? String(v) : fallback;
+
 function adminUserRegistered(data: BaseTemplateData): EmailTemplateResult {
-  const name = data.fullName || data.userName || "Unknown User";
+  const name = safe(data.fullName || data.userName, "Unknown User");
+  const email = safe(data.email || data.userEmail);
 
   const html = createAdminEmailWrapper(`
     <div class="email-body">
@@ -1056,7 +1061,7 @@ function adminUserRegistered(data: BaseTemplateData): EmailTemplateResult {
         </div>
         <div class="detail-row">
           <span class="detail-label">Email Address</span>
-          <span class="detail-value">${data.email || data.userEmail}</span>
+          <span class="detail-value">${email}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Registered At</span>
@@ -1081,7 +1086,8 @@ function adminUserRegistered(data: BaseTemplateData): EmailTemplateResult {
 }
 
 function adminWelcomeUser(data: BaseTemplateData): EmailTemplateResult {
-  const name = data.fullName || data.userName || "Unknown User";
+  const name = safe(data.fullName || data.userName, "Unknown User");
+  const email = safe(data.email || data.userEmail);
 
   const html = createAdminEmailWrapper(`
     <div class="email-body">
@@ -1099,7 +1105,7 @@ function adminWelcomeUser(data: BaseTemplateData): EmailTemplateResult {
         </div>
         <div class="detail-row">
           <span class="detail-label">Email</span>
-          <span class="detail-value">${data.email || data.userEmail}</span>
+          <span class="detail-value">${email}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Status</span>
@@ -1128,23 +1134,23 @@ function adminListingSubmitted(data: ListingData): EmailTemplateResult {
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Artwork Title</span>
-          <span class="detail-value">${data.title}</span>
+          <span class="detail-value">${safe(data.title)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Submitted By</span>
-          <span class="detail-value">${data.fullName || data.userName}</span>
+          <span class="detail-value">${safe(data.fullName || data.userName)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Email</span>
-          <span class="detail-value">${data.email || data.userEmail}</span>
+          <span class="detail-value">${safe(data.email || data.userEmail)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Category</span>
-          <span class="detail-value">${data.category || "—"}</span>
+          <span class="detail-value">${safe(data.category)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Medium</span>
-          <span class="detail-value">${data.medium || "—"}</span>
+          <span class="detail-value">${safe(data.medium)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Starting Price</span>
@@ -1159,7 +1165,7 @@ function adminListingSubmitted(data: ListingData): EmailTemplateResult {
   `);
 
   return {
-    subject: `[ADMIN] New Listing Submitted: ${data.title}`,
+    subject: `[ADMIN] New Listing Submitted: ${safe(data.title)}`,
     html,
   };
 }
@@ -1177,22 +1183,22 @@ function adminListingApproved(data: ListingData): EmailTemplateResult {
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Artwork</span>
-          <span class="detail-value">${data.title}</span>
+          <span class="detail-value">${safe(data.title)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Owner</span>
-          <span class="detail-value">${data.fullName || data.userName}</span>
+          <span class="detail-value">${safe(data.fullName || data.userName)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Email</span>
-          <span class="detail-value">${data.email || data.userEmail}</span>
+          <span class="detail-value">${safe(data.email || data.userEmail)}</span>
         </div>
       </div>
     </div>
   `);
 
   return {
-    subject: `[ADMIN] Listing Approved: ${data.title}`,
+    subject: `[ADMIN] Listing Approved: ${safe(data.title)}`,
     html,
   };
 }
@@ -1212,22 +1218,22 @@ function adminListingRejected(
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Artwork</span>
-          <span class="detail-value">${data.title}</span>
+          <span class="detail-value">${safe(data.title)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Submitted By</span>
-          <span class="detail-value">${data.fullName || data.userName}</span>
+          <span class="detail-value">${safe(data.fullName || data.userName)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Email</span>
-          <span class="detail-value">${data.email || data.userEmail}</span>
+          <span class="detail-value">${safe(data.email || data.userEmail)}</span>
         </div>
         ${
           data.reason
             ? `
         <div class="detail-row" style="margin-top: 8px; padding-top: 12px; border-top: 1px solid #E8DFD4;">
           <span class="detail-label">Rejection Reason</span>
-          <span class="detail-value" style="text-align: left; max-width: 300px;">${data.reason}</span>
+          <span class="detail-value" style="text-align: left; max-width: 300px;">${safe(data.reason)}</span>
         </div>`
             : ""
         }
@@ -1236,7 +1242,7 @@ function adminListingRejected(
   `);
 
   return {
-    subject: `[ADMIN] Listing Rejected: ${data.title}`,
+    subject: `[ADMIN] Listing Rejected: ${safe(data.title)}`,
     html,
   };
 }
@@ -1254,7 +1260,7 @@ function adminBidPlaced(data: BidData): EmailTemplateResult {
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Artwork</span>
-          <span class="detail-value">${data.lotTitle}</span>
+          <span class="detail-value">${safe(data.lotTitle)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Bid Amount</span>
@@ -1262,11 +1268,11 @@ function adminBidPlaced(data: BidData): EmailTemplateResult {
         </div>
         <div class="detail-row">
           <span class="detail-label">Placed By</span>
-          <span class="detail-value">${data.fullName || data.userName}</span>
+          <span class="detail-value">${safe(data.fullName || data.userName)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Bidder Email</span>
-          <span class="detail-value">${data.email || data.userEmail}</span>
+          <span class="detail-value">${safe(data.email || data.userEmail)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Placed At</span>
@@ -1277,7 +1283,7 @@ function adminBidPlaced(data: BidData): EmailTemplateResult {
   `);
 
   return {
-    subject: `[ADMIN] New Bid: ${data.lotTitle} — ${formatCurrency(data.bidAmount)}`,
+    subject: `[ADMIN] New Bid: ${safe(data.lotTitle)} — ${formatCurrency(data.bidAmount)}`,
     html,
   };
 }
@@ -1295,7 +1301,7 @@ function adminOutbidNotification(data: BidData): EmailTemplateResult {
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Artwork</span>
-          <span class="detail-value">${data.lotTitle}</span>
+          <span class="detail-value">${safe(data.lotTitle)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">New Highest Bid</span>
@@ -1307,14 +1313,14 @@ function adminOutbidNotification(data: BidData): EmailTemplateResult {
         </div>
         <div class="detail-row">
           <span class="detail-label">Outbid User</span>
-          <span class="detail-value">${data.fullName || data.userName}</span>
+          <span class="detail-value">${safe(data.fullName || data.userName)}</span>
         </div>
       </div>
     </div>
   `);
 
   return {
-    subject: `[ADMIN] Outbid Event: ${data.lotTitle}`,
+    subject: `[ADMIN] Outbid Event: ${safe(data.lotTitle)}`,
     html,
   };
 }
@@ -1332,7 +1338,7 @@ function adminAuctionWon(data: AuctionData): EmailTemplateResult {
       <div class="detail-card">
         <div class="detail-row">
           <span class="detail-label">Artwork</span>
-          <span class="detail-value">${data.lotTitle}</span>
+          <span class="detail-value">${safe(data.lotTitle)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Final Sale Price</span>
@@ -1340,18 +1346,18 @@ function adminAuctionWon(data: AuctionData): EmailTemplateResult {
         </div>
         <div class="detail-row">
           <span class="detail-label">Winner</span>
-          <span class="detail-value">${data.winnerName || "—"}</span>
+          <span class="detail-value">${safe(data.winnerName)}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">Seller</span>
-          <span class="detail-value">${data.sellerName || "—"}</span>
+          <span class="detail-value">${safe(data.sellerName)}</span>
         </div>
       </div>
     </div>
   `);
 
   return {
-    subject: `[ADMIN] Auction Won: ${data.lotTitle} — ${formatCurrency(data.finalPrice)}`,
+    subject: `[ADMIN] Auction Won: ${safe(data.lotTitle)} — ${formatCurrency(data.finalPrice)}`,
     html,
   };
 }
@@ -1869,14 +1875,19 @@ export async function notifyBoth(
 /**
  * Send ONLY an admin notification (to support@sharjahbiennial.online).
  * Uses the admin-specific template design and wording.
+ * The `data` payload (title, amount, fullName, email, etc.) is merged in.
  */
 export async function sendAdminNotification(
   activity: EmailActivityType,
-  data: any
+  data: any = {}
 ): Promise<{ success: boolean; error?: any }> {
   return sendGalleryEmail(
     activity,
-    { to_email: ADMIN_EMAIL, to_name: "Admin" },
+    {
+      to_email: ADMIN_EMAIL,
+      to_name: "Admin",
+      ...data, // include all the payload fields (fullName, email, title, amount, etc.)
+    },
     undefined,
     "admin"
   );

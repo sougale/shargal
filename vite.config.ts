@@ -52,6 +52,8 @@ export default defineConfig(({ mode }) => {
           // optional – the default shell is /_shell.html
           prerender: {
             outputPath: "/_shell.html",
+            enabled: true,
+            crawlLinks: true,
           },
         },
 

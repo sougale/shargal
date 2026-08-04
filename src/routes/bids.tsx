@@ -19,7 +19,9 @@ function BidsPage() {
 
   const rows = bids
     .map((b) => ({ bid: b, lot: getAuctionBySlug(b.slug) }))
-    .filter((r): r is { bid: typeof r.bid; lot: NonNullable<typeof r.lot> } => !!r.lot);
+    .filter(
+      (r): r is { bid: typeof r.bid; lot: NonNullable<typeof r.lot> } => !!r.lot
+    );
 
   return (
     <>
@@ -78,7 +80,9 @@ function BidsPage() {
                             {formatBid(bid.bidAmount)}
                           </span>
                         </span>
-                        <span className="text-detail">Last Bid: {formatBid(bid.lastBid)}</span>
+                        <span className="text-detail">
+                          Last Bid: {formatBid(bid.lastBid)}
+                        </span>
                         <span
                           className={
                             leading

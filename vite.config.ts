@@ -50,7 +50,7 @@ export default defineConfig(({ mode }) => {
         server: { entry: "server" },
 
         prerender: {
-          enabled: true,
+          enabled: false,
         }, // or false if you want pure SPA
       }),
       viteReact(),

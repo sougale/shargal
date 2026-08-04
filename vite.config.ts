@@ -47,11 +47,17 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       tsConfigPaths({ projects: ["./tsconfig.json"] }),
       tanstackStart({
-        server: { entry: "server" },
+        spa: {
+          enabled: true,
+          // optional – the default shell is /_shell.html
+          prerender: {
+            outputPath: "/_shell.html",
+          },
+        },
 
         prerender: {
-          enabled: false,
-        }, // or false if you want pure SPA
+          enabled: false, // keep false unless you also want specific pages pre-rendered
+        },
       }),
       viteReact(),
     ],

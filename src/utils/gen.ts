@@ -1,9 +1,12 @@
 import { Collections } from "@/hooks/useDoc";
 import { toast, useToast } from "@/lib/useToast";
-import { appwriteConfig } from "@/services/appwrite";
+import { appWriteConfig } from "@/services/appwrite";
 import { useDataStore } from "@/store/zustand";
 import { clsx, type ClassValue } from "clsx";
-import { MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
+import {
+  MouseEvent as ReactMouseEvent,
+  TouchEvent as ReactTouchEvent,
+} from "react";
 import { twMerge } from "tailwind-merge";
 import z from "zod";
 import { Client, Storage, ID } from "appwrite";
@@ -24,14 +27,18 @@ export function cn(...inputs: ClassValue[]) {
  *   <div onClick={(e) => scrollToCenter(e)}>Click</div>
  */
 export function scrollToCenter(
-  event: ReactMouseEvent<HTMLElement> | ReactTouchEvent<HTMLElement> | MouseEvent | TouchEvent,
+  event:
+    | ReactMouseEvent<HTMLElement>
+    | ReactTouchEvent<HTMLElement>
+    | MouseEvent
+    | TouchEvent,
   options?: {
     behavior?: ScrollBehavior;
     /** Vertical alignment */
     block?: ScrollLogicalPosition;
     /** Horizontal alignment - 'center' is what you usually want */
     inline?: ScrollLogicalPosition;
-  },
+  }
 ) {
   const target = (event.currentTarget || event.target) as HTMLElement | null;
   if (!target) return;
@@ -62,7 +69,7 @@ export function scrollElementToCenter(
     behavior?: ScrollBehavior;
     block?: ScrollLogicalPosition;
     inline?: ScrollLogicalPosition;
-  },
+  }
 ) {
   if (!element) return;
 
@@ -167,7 +174,9 @@ export function findObj<T extends { id: string }>({
   prop: keyof T;
   collection: keyof Collections;
 }): T | undefined {
-  const storeCollection = useDataStore.getState()[collection as keyof Collections] as T[];
+  const storeCollection = useDataStore.getState()[
+    collection as keyof Collections
+  ] as T[];
   const obj = storeCollection.find((s) => s[prop] == id) as T;
   return obj;
 }
@@ -236,6 +245,9 @@ export async function handleWalletBalance({
   }
 }
 
-export const checkForUserID = <T extends { userID: string }>(arr: T[], id: string) => {
+export const checkForUserID = <T extends { userID: string }>(
+  arr: T[],
+  id: string
+) => {
   return arr.filter((a) => a.userID == id);
 };

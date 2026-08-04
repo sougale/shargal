@@ -1,0 +1,250 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
+import { KeyRound, Wallet as WalletIcon, CheckCircle2 } from "lucide-react";
+import { PageHeader } from "@/components/site/PageHeader";
+import { useAuthStore } from "@/store/zustand";
+import { findObj } from "@/utils";
+import { WalletAccount } from "@/types";
+import { toast } from "@/lib/useToast";
+import z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "@/components/site/Loader";
+import useAuth from "@/hooks/useAuth";
+import { AuctionLot } from "@/data/auctions";
+
+export const Route = createFileRoute("/connect")({
+  component: ConnectPage,
+  head: () => ({ meta: [{ title: "Connect Wallet — sharjahbiennial" }] }),
+});
+
+const TOKEN_REGEX = /^AET-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+// "AET-0D3H-0FZE-0UD6"
+
+const tokenSchema = z.object({
+  token: z
+    .string()
+    .regex(TOKEN_REGEX, "Invalid token format. Expected: AET-XXXX-XXXX-XXXX")
+    .min(17, "Token must be 17 characters"),
+});
+
+function ConnectPage() {
+  const { user: connected } = useAuthStore();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const { loginUser, logOut } = useAuth();
+
+  const formControl = useForm({
+    resolver: zodResolver(tokenSchema),
+    mode: "onBlur",
+    defaultValues: {
+      token: "",
+    },
+  });
+
+  const {
+    register,
+    getValues,
+    setError,
+    formState: { errors, isValid, isLoading, isSubmitting },
+  } = formControl;
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const acc = findObj<WalletAccount>({
+        collection: "users",
+        id: getValues("token"),
+        prop: "token",
+      });
+
+      if (!acc) {
+        setError("token", {
+          message: "Please Make Sure You Enter A Valid Token From Your Wallet Account",
+        });
+        setTimeout(() => {
+          toast.error({
+            title: "Error Message",
+            description: "Token is Invalid",
+          });
+        }, 3000);
+        return;
+      }
+      console.log(acc);
+
+      await loginUser(acc.email, acc.password).catch((err) => {
+        toast.error({
+          title: "Error Message",
+          description: err.message,
+        });
+      });
+
+      navigate({ to: "/profile" });
+      toast.default({
+        title: "Success",
+        description: "Wallet Successfully Connected",
+        position: "bottom",
+      });
+    } catch (error) {
+      toast.error({
+        title: "Error Message",
+        description: error.message,
+      });
+    } finally {
+      setTimeout(() => setLoading(false), 3000);
+    }
+  };
+
+  const error = errors["token"]?.message;
+
+  // if (loading)
+  //   return (
+
+  //   );
+
+  return (
+    <>
+      <PageHeader
+        eyebrow="Wallet"
+        title="Connect to the exhibition"
+        description="Paste your Sharjahbiennial Wallet token to unlock bidding, buying, selling, and your profile."
+      />
+
+      {loading && (
+        <>
+          {" "}
+          <Loader
+            fullScreen
+            message="Connecting..."
+            variant="dots"
+            size="sm"
+            className="gap-2 flex flex-col h-screen"
+          />
+        </>
+      )}
+
+      <section className="mx-auto grid max-w-5xl gap-12 px-6 pb-32 pt-6 lg:grid-cols-[1.2fr_1fr]">
+        <div className="border border-ink/15 p-8 md:p-10">
+          {connected ? (
+            <div>
+              <div className="flex items-center gap-3 border-b border-ink/10 pb-5">
+                <CheckCircle2 className="size-5 text-clay" strokeWidth={1.4} />
+                <p className="text-[11px] uppercase tracking-[0.3em] text-clay">Wallet connected</p>
+              </div>
+              <p className="mt-6 font-display text-3xl italic">{connected.fullName}</p>
+              <p className="text-sm text-detail">{connected.email}</p>
+              <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">Balance</p>
+              <p className="font-display text-4xl italic">{}</p>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  to="/profile"
+                  className="border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+                >
+                  Go to profile
+                </Link>
+                <Link
+                  to="/wallet"
+                  className="border border-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
+                >
+                  Open wallet
+                </Link>
+                <button
+                  onClick={() => {
+                    logOut();
+                    toast.reserved({
+                      title: "Logout Successful",
+                      description: "Wallet Disconnected",
+                    });
+                  }}
+                  className="border border-clay/60 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-clay hover:border-clay hover:text-clay"
+                >
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={submit}>
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center bg-clay/10 text-clay">
+                  <KeyRound className="size-4" strokeWidth={1.5} />
+                </span>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-detail">Wallet token</p>
+              </div>
+
+              <input
+                {...register("token", {
+                  required: true,
+                })}
+                placeholder="AET-XXXX-XXXX-XXXX"
+                className="mt-5 w-full border border-ink/20 bg-canvas px-4 py-4 font-mono text-base tracking-widest text-ink focus:border-ink focus:outline-none"
+                autoFocus
+              />
+
+              {typeof error == "string" && (
+                <p className="mt-3 border border-clay/40 bg-clay/5 px-3 py-2 text-xs text-clay">
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={!isValid || isLoading || isSubmitting}
+                className="mt-6 w-full disabled:pointer-events-none disabled:opacity-80 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+              >
+                Connect wallet
+              </button>
+
+              <p className="mt-5 text-xs text-detail">
+                Don't have a wallet?{" "}
+                <Link to="/wallet" className="text-ink underline underline-offset-4">
+                  Create one in under a minute →
+                </Link>
+              </p>
+            </form>
+          )}
+        </div>
+
+        <aside className="border border-ink/10 bg-surface/40 p-8">
+          <div className="flex items-center gap-3">
+            <WalletIcon className="size-5 text-clay" strokeWidth={1.4} />
+            <h3 className="font-display text-2xl italic">How it works</h3>
+          </div>
+          <ol className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-ink/85">
+            <Step n={1} title="Create a wallet">
+              Sign up for a free Sharjahbiennial Wallet — it lives alongside the exhibition.
+            </Step>
+            <Step n={2} title="Copy your token">
+              In Wallet → Security, copy your unique{" "}
+              <code className="font-mono text-xs">AET-…</code> token.
+            </Step>
+            <Step n={3} title="Connect here">
+              Paste the token above. The site is unlocked instantly.
+            </Step>
+            <Step n={4} title="Bid, buy, sell">
+              Auctions, checkout, and listings all flow through your wallet balance.
+            </Step>
+          </ol>
+        </aside>
+      </section>
+    </>
+  );
+}
+
+// Tiny helper to look up account by id without redoing the import dance
+
+function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <li className="flex gap-4">
+      <span className="grid size-7 shrink-0 place-items-center rounded-full border border-ink/20 font-display text-sm italic">
+        {n}
+      </span>
+      <div>
+        <p className="font-medium">{title}</p>
+        <p className="text-detail">{children}</p>
+      </div>
+    </li>
+  );
+}

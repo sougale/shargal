@@ -1,0 +1,6 @@
+YAMLservices:
+  - type: static
+    name: artora-mint-static
+    buildCommand: npm run build
+    publishPath: dist
+    pullRequestPreviewsEnabled: true

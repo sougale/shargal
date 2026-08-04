@@ -1,0 +1,303 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "animate.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-detail: var(--detail);
+  --color-accent: var(--accent);
+  --color-clay: var(--clay);
+
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--canvas);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--ink);
+  --color-primary-foreground: var(--canvas);
+  --color-secondary: var(--surface);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--surface);
+  --color-muted-foreground: var(--detail);
+  --color-destructive: oklch(0.55 0.2 27);
+  --color-destructive-foreground: var(--canvas);
+  --color-border: var(--border-color);
+  --color-input: var(--border-color);
+  --color-ring: var(--detail);
+}
+
+:root {
+  --canvas: oklch(0.978 0.008 80);
+  --surface: oklch(0.945 0.014 75);
+  --accent: oklch(0.795 0.05 80);
+  --detail: oklch(0.555 0.04 65);
+  --ink: oklch(0.305 0.018 60);
+  --clay: oklch(0.57 0.135 38);
+
+  --background: var(--canvas);
+  --foreground: var(--ink);
+  --border-color: oklch(0.555 0.04 65 / 0.15);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+  }
+  ::selection {
+    background-color: var(--color-clay);
+    color: var(--color-canvas);
+  }
+  .font-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+/* =================================================================
+ * Wallet — dark orange + black. Flat, no gradients.
+ * Inspired by mature fintech (Cash App / Revolut / Phantom).
+ * ================================================================= */
+.wallet-theme {
+  /* Yellow accent on dark blue, with cool grey + white */
+  --w-brand: oklch(0.88 0.17 95);
+  --w-brand-hi: oklch(0.93 0.16 98);
+  --w-brand-lo: oklch(0.8 0.16 90);
+  --w-brand-contrast: oklch(0.2 0.05 260);
+  --w-brand-soft: oklch(0.88 0.17 95 / 0.16);
+  --w-brand-ring: oklch(0.88 0.17 95 / 0.4);
+
+  --w-pos: oklch(0.82 0.14 150);
+  --w-neg: oklch(0.7 0.16 25);
+  --w-danger: oklch(0.64 0.2 25);
+  --w-info: oklch(0.78 0.12 230);
+
+  --w-bg: oklch(0.2 0.045 260);
+  --w-bg-2: oklch(0.25 0.045 260);
+  --w-surface: oklch(0.28 0.04 258);
+  --w-surface-2: oklch(0.33 0.038 256);
+  --w-input: oklch(0.3 0.035 258);
+  --w-fg: oklch(0.985 0.005 250);
+  --w-muted: oklch(0.78 0.02 255);
+  --w-border: oklch(0.88 0.02 250 / 0.14);
+  --w-border-hi: oklch(0.92 0.02 250 / 0.24);
+
+  background-color: var(--w-bg);
+  color: var(--w-fg);
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
+.wallet-theme .font-display {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-style: normal;
+}
+.wallet-theme ::selection {
+  background: var(--w-brand);
+  color: var(--w-brand-contrast);
+}
+
+/* Dotted grid background for hero (no gradient — solid dots) */
+.wallet-dotgrid {
+  background-image:
+    linear-gradient(var(--w-border-hi) 1px, transparent 1px),
+    linear-gradient(90deg, var(--w-border-hi) 1px, transparent 1px);
+  background-size: 22px 22px;
+  opacity: 0.4;
+}
+.wallet-dotgrid {
+  background-image: none;
+}
+.wallet-dotgrid {
+  /* solid micro-dots via repeating background using box-shadow trick is heavy;
+     keep it minimal: a subtle solid tint instead of any gradient */
+  background-color: var(--w-bg-2);
+  background-image: none;
+}
+
+/* Flat ring used on featured cards — solid shadow, no gradient */
+.wallet-ring {
+  box-shadow:
+    0 0 0 1px var(--w-border),
+    0 18px 40px -24px oklch(0 0 0 / 0.6);
+}
+
+/* Marquee */
+@keyframes w-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.wallet-marquee {
+  animation: w-marquee 28s linear infinite;
+}
+
+/* Subtle pulse for the live dot */
+@keyframes w-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--w-brand-ring);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+.wallet-live-dot {
+  animation: w-pulse 1.8s ease-out infinite;
+  background: var(--w-brand);
+}
+
+/* Hide scrollbar on horizontal scrollers */
+.wallet-hscroll::-webkit-scrollbar {
+  display: none;
+}
+.wallet-hscroll {
+  scrollbar-width: none;
+}
+
+/* =================================================================
+ * Admin Console — standalone identity.
+ * Pure black canvas, warm champagne gold accent, cool slate text.
+ * ================================================================= */
+.admin-theme {
+  /* True black family — deep, layered darkness */
+  --a-bg: oklch(0.07 0 0); /* #0a0a0a  near-black */
+  --a-bg-2: oklch(0.1 0 0); /* #111111 */
+  --a-surface: oklch(0.125 0.005 260); /* #18181b  zinc-900 */
+  --a-surface-2: oklch(0.18 0.008 260); /* #27272a  zinc-800 */
+  --a-elev: oklch(0.22 0.01 260);
+  --a-input: oklch(0.14 0.008 260);
+
+  --a-fg: oklch(0.985 0.005 250); /* zinc-50 */
+  --a-fg-2: oklch(0.9 0.012 250); /* zinc-200 */
+  --a-muted: oklch(0.7 0.018 255); /* zinc-400 */
+  --a-faint: oklch(0.52 0.02 257); /* zinc-500 */
+
+  --a-border: oklch(0.92 0.02 250 / 0.08);
+  --a-border-hi: oklch(0.95 0.02 250 / 0.18);
+
+  /* Champagne gold — elegant counterpoint to pure black */
+  --a-accent: oklch(0.85 0.12 85);
+  --a-accent-hi: oklch(0.9 0.115 87);
+  --a-accent-ink: oklch(0.07 0 0);
+  --a-accent-soft: oklch(0.85 0.12 85 / 0.12);
+
+  /* Secondary — cool steel blue for variety */
+  --a-accent-2: oklch(0.7 0.1 240);
+  --a-accent-2-soft: oklch(0.7 0.1 240 / 0.14);
+
+  --a-info: oklch(0.7 0.1 240);
+  --a-pos: oklch(0.75 0.13 150); /* emerald */
+  --a-neg: oklch(0.65 0.18 25); /* rose */
+  --a-warn: oklch(0.82 0.13 76); /* amber */
+
+  background-color: var(--a-bg);
+  color: var(--a-fg);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  background-image:
+    radial-gradient(1200px 700px at 0% 0%, oklch(0.85 0.12 85 / 0.055), transparent 60%),
+    radial-gradient(1000px 600px at 100% 10%, oklch(0.7 0.1 240 / 0.045), transparent 65%);
+  background-attachment: fixed;
+}
+
+.admin-theme .font-display {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-style: normal;
+}
+.admin-theme .a-mono {
+  font-family: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, monospace;
+}
+.admin-theme ::selection {
+  background: var(--a-accent);
+  color: var(--a-accent-ink);
+}
+.admin-theme .a-eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--a-muted);
+}
+.admin-theme .a-card {
+  background: var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: 14px;
+}
+.admin-theme .a-card-elev {
+  background: linear-gradient(180deg, oklch(1 0 0 / 0.02), transparent 40%), var(--a-surface);
+  border: 1px solid var(--a-border);
+  border-radius: 14px;
+  box-shadow:
+    0 1px 0 0 var(--a-border-hi) inset,
+    0 28px 70px -36px oklch(0 0 0 / 0.85);
+}
+.admin-theme .a-grid-bg {
+  background-image:
+    linear-gradient(var(--a-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--a-border) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.admin-theme .a-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.admin-theme .a-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--a-border-hi);
+  border-radius: 4px;
+}
+.admin-theme .a-row-link {
+  cursor: pointer;
+}
+
+@keyframes a-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.admin-theme .a-live {
+  animation: a-blink 1.6s ease-in-out infinite;
+}

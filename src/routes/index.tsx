@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { changeMetArtWorkProps, artworks as staticArtworks } from "@/data/artworks";
+import {
+  changeMetArtWorkProps,
+  artworks as staticArtworks,
+} from "@/data/artworks";
 import { categories } from "@/data/categories";
 import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
@@ -13,12 +16,16 @@ import { useChicagoArtworksByCategory } from "@/queries";
 import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { Loader } from "@/components/site/Loader";
 import { useArtInstitute } from "@/hooks/useChicagoArt";
+import { getChicagoImageUrl, type ChicagoArtwork } from "@/queries/chicago";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
   head: () => ({
     meta: [
-      { title: "Sharjahbiennial — A Curated Exhibition of Contemporary Artworks" },
+      {
+        title:
+          "Sharjahbiennial — A Curated Exhibition of Contemporary Artworks",
+      },
       {
         name: "description",
         content:
@@ -51,16 +58,26 @@ function HomePage() {
   const { artworks: data, loading: caLoading } = useArtInstitute();
 
   // Transform for display (Chicago data needs light mapping for ImageCarousel)
-  const chicagoArtworks = (data ?? []).map((a) => ({
-    id: a.id,
-    image: a.image_id ? `https://www.artic.edu/iiif/2/${a.image_id}/full/843,/0/default.jpg` : "",
-    title: a.title,
-    price: 1200 + (a.id % 8000),
-    height: a.thumbnail?.height || 600,
-    width: a.thumbnail?.width || 800,
-    name: a.artist_display || "Unknown",
-    medium: a.medium_display,
-  }));
+  // Filter out records without a usable image_id, then drop any resulting item
+  // whose final `image` property is an empty string (or not ready).
+  const chicagoArtworks = (data ?? [])
+    .filter(
+      (a): a is ChicagoArtwork & { image_id: string; medium: string } =>
+        typeof a.image_id === "string" &&
+        a.image_id.trim() !== "" &&
+        !!a.medium_display
+    )
+    .map((a) => ({
+      id: a.id,
+      image: getChicagoImageUrl(a.image_id),
+      title: a.title,
+      price: 1200 + (a.id % 8000),
+      height: a.thumbnail?.height || 600,
+      width: a.thumbnail?.width || 800,
+      name: a.artist_display || "Unknown",
+      medium: a.medium_display || "N/A",
+    }))
+    .filter((a) => typeof a.image === "string" && a.image.trim() !== "");
 
   if (isLoading || caLoading) {
     return (
@@ -88,14 +105,15 @@ function HomePage() {
           </p>
           <div className="space-y-6 text-xl leading-relaxed text-ink/85 md:text-2xl">
             <p>
-              Sharjahbiennial is a quiet room on the internet — a curated dialogue between
-              permanence and the ephemeral, between clay that takes a week to set and a photograph
-              that takes six hours of held breath.
+              Sharjahbiennial is a quiet room on the internet — a curated
+              dialogue between permanence and the ephemeral, between clay that
+              takes a week to set and a photograph that takes six hours of held
+              breath.
             </p>
             <p className="text-base text-detail md:text-lg">
-              We hang one exhibition at a time, for one season at a time. Twelve artists in
-              permanent rotation, four shows a year, no algorithm, no infinite scroll. Just the
-              work, given room.
+              We hang one exhibition at a time, for one season at a time. Twelve
+              artists in permanent rotation, four shows a year, no algorithm, no
+              infinite scroll. Just the work, given room.
             </p>
           </div>
         </div>
@@ -115,7 +133,9 @@ function HomePage() {
             <p className="mb-3 text-[11px] uppercase tracking-[0.3em] text-detail">
               The exhibition, in part
             </p>
-            <h2 className="font-display text-3xl italic md:text-4xl">Selected Works</h2>
+            <h2 className="font-display text-3xl italic md:text-4xl">
+              Selected Works
+            </h2>
           </div>
           <Link
             to="/gallery"
@@ -126,7 +146,10 @@ function HomePage() {
         </div>
 
         {modMetArtworks.length === 0 ? (
-          <Loader message="Loading Selected Works..." className="py-16 md:py-24" />
+          <Loader
+            message="Loading Selected Works..."
+            className="py-16 md:py-24"
+          />
         ) : (
           <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
             {modMetArtworks.slice(0, 6).map((a, i) => (
@@ -145,7 +168,9 @@ function HomePage() {
       {/* Categories preview */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="mb-12 flex items-end justify-between border-b border-ink/10 pb-6">
-          <h2 className="font-display text-3xl italic md:text-4xl">By Mode of Design</h2>
+          <h2 className="font-display text-3xl italic md:text-4xl">
+            By Mode of Design
+          </h2>
           <Link
             to="/categories"
             className="text-[11px] uppercase tracking-[0.22em] text-detail hover:text-ink"
@@ -161,9 +186,13 @@ function HomePage() {
               params={{ slug: c.slug }}
               className="group flex flex-col gap-3 bg-canvas p-8 transition-colors hover:bg-surface"
             >
-              <span className="text-[10px] uppercase tracking-[0.22em] text-detail">Category</span>
+              <span className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Category
+              </span>
               <h3 className="font-display text-3xl italic">{c.label}</h3>
-              <p className="text-sm leading-relaxed text-detail">{c.description}</p>
+              <p className="text-sm leading-relaxed text-detail">
+                {c.description}
+              </p>
             </Link>
           ))}
         </div>

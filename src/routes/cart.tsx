@@ -8,8 +8,10 @@ import { useArtworkContext } from "@/lib/useMetArtworksStore";
 import { useToast } from "@/lib/useToast";
 import { useAuthStore } from "@/store/zustand";
 import { AccountStatusBlocker } from "@/components/site/AccountStatusBlocker";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 import useDoc from "@/hooks/useDoc";
 import { serverTimestamp, Timestamp } from "firebase/firestore";
 
@@ -29,12 +31,18 @@ function CartPage() {
   const rows = cart
     .map((c) => ({ item: c, artwork: getArtworkBySlug(c.slug, artworks) }))
     .filter(
-      (r): r is { item: typeof r.item; artwork: NonNullable<typeof r.artwork> } => !!r.artwork,
+      (
+        r
+      ): r is { item: typeof r.item; artwork: NonNullable<typeof r.artwork> } =>
+        !!r.artwork
     );
 
   console.log(rows);
 
-  const subtotal = rows.reduce((s, r) => s + r.artwork.price * r.item.quantity, 0);
+  const subtotal = rows.reduce(
+    (s, r) => s + r.artwork.price * r.item.quantity,
+    0
+  );
   const shipping = rows.length ? 95 : 0;
   const total = subtotal + shipping;
 
@@ -103,15 +111,21 @@ function CartPage() {
                     <div className="mt-auto flex items-end justify-between pt-4">
                       <div className="flex items-center border border-ink/20">
                         <button
-                          onClick={() => setQuantity(item.slug, item.quantity - 1)}
+                          onClick={() =>
+                            setQuantity(item.slug, item.quantity - 1)
+                          }
                           className="px-3 py-2 text-detail hover:text-ink"
                           aria-label="Decrease"
                         >
                           <Minus className="size-3.5" strokeWidth={1.5} />
                         </button>
-                        <span className="min-w-8 text-center text-sm">{item.quantity}</span>
+                        <span className="min-w-8 text-center text-sm">
+                          {item.quantity}
+                        </span>
                         <button
-                          onClick={() => setQuantity(item.slug, item.quantity + 1)}
+                          onClick={() =>
+                            setQuantity(item.slug, item.quantity + 1)
+                          }
                           className="px-3 py-2 text-detail hover:text-ink"
                           aria-label="Increase"
                         >
@@ -139,8 +153,12 @@ function CartPage() {
                   <dd>{formatPrice(shipping)}</dd>
                 </div>
                 <div className="mt-3 flex items-baseline justify-between border-t border-ink/10 pt-4">
-                  <dt className="text-[11px] uppercase tracking-[0.22em] text-detail">Total</dt>
-                  <dd className="font-display text-3xl italic">{formatPrice(total)}</dd>
+                  <dt className="text-[11px] uppercase tracking-[0.22em] text-detail">
+                    Total
+                  </dt>
+                  <dd className="font-display text-3xl italic">
+                    {formatPrice(total)}
+                  </dd>
                 </div>
               </dl>
               {!isAccountActive && user ? (
@@ -156,7 +174,8 @@ function CartPage() {
                     if (!active) {
                       toast({
                         title: "Account not active",
-                        description: "Your account must be approved before you can checkout.",
+                        description:
+                          "Your account must be approved before you can checkout.",
                         variant: "info",
                       });
                       return;
@@ -177,7 +196,8 @@ function CartPage() {
               )}
 
               <p className="mt-3 text-center text-[10px] uppercase tracking-[0.22em] text-detail">
-                {rows.length} {rows.length === 1 ? "work" : "works"} · of {artworks.length} on view
+                {rows.length} {rows.length === 1 ? "work" : "works"} · of{" "}
+                {artworks.length} on view
               </p>
             </aside>
           </div>

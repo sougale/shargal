@@ -1,10 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Heart, ShoppingBag, Gavel, Upload, Mail, MapPin, ImageDown } from "lucide-react";
+import {
+  Heart,
+  ShoppingBag,
+  Gavel,
+  Upload,
+  Mail,
+  MapPin,
+  ImageDown,
+  DollarSign,
+} from "lucide-react";
 import { useStore } from "@/lib/store";
 import { PageHeader } from "@/components/site/PageHeader";
 import { useAuthStore, useDataStore } from "@/store/zustand";
 import { fmtDateTime } from "@/data/admin-mock";
 import { checkForUserID } from "@/utils";
+import { formatBid } from "@/data/auctions";
 
 // Module-scoped selectors (Zustand best practice: define at module scope, never inline inside components)
 type DataState = ReturnType<typeof useDataStore.getState>;
@@ -37,7 +47,12 @@ function ProfilePage() {
   const { favorites, cart } = useStore();
 
   const stats = [
-    { label: "Favourites", value: favorites.length, to: "/favourites", icon: Heart },
+    {
+      label: "Favourites",
+      value: favorites.length,
+      to: "/favourites",
+      icon: Heart,
+    },
     {
       label: "In cart",
       value: cart.reduce((s, c) => s + c.quantity, 0),
@@ -45,7 +60,12 @@ function ProfilePage() {
       icon: ShoppingBag,
     },
     { label: "Active bids", value: bids.length, to: "/bids", icon: Gavel },
-    { label: "Listings", value: listings.length, to: "/listings", icon: Upload },
+    {
+      label: "Listings",
+      value: listings.length,
+      to: "/listings",
+      icon: Upload,
+    },
     {
       label: "Active Auctions",
       value: user?.userID ? checkForUserID(auctions, user.userID).length : 0,
@@ -56,22 +76,58 @@ function ProfilePage() {
 
   return (
     <>
+      {user && user.role == "user" ? (
+        <div className="mx-auto flex max-w-7xl flex-wrap bg-detail/5 items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
+          <span>Wallet connected · {user?.fullName} </span>
+          <div className="flex justify-between w-full items-center">
+            <div className="flex items-center gap-1">
+              <DollarSign className="size-4" />
+              {formatBid(user?.wallet.balance ?? 0)}
+              <p>·</p>
+              <Gavel className="size-4" />
+              {formatBid(user?.wallet.bidBalance ?? 0)}
+            </div>
+            <Link to="/wallet" className="text-ink hover:text-clay block">
+              Open wallet →
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="mx-auto flex max-w-7xl flex-wrap bg-detail/5 items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
+          <span>
+            {user?.fullName} ·{" "}
+            <Link to="/admin" className="underline leading-0.5">
+              Go To Admin Dashboard
+            </Link>
+          </span>
+        </div>
+      )}
       <PageHeader eyebrow="Your account" title="Profile" />
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-24 lg:grid-cols-[1fr_1.4fr]">
         <aside className="border border-ink/10 p-8">
-          {!user && <p className="text-detail mb-5 font-mono text-sm">Placeholder Info:</p>}
+          {!user && (
+            <p className="text-detail mb-5 font-mono text-sm">
+              Placeholder Info:
+            </p>
+          )}
           <div className="flex size-24 items-center justify-center rounded-full bg-clay/15 font-display text-4xl italic text-clay">
             {user?.fullName
               .split(" ")
               .map((f) => f[0])
               .slice(0, 2) || localUser.name.charAt(0)}
           </div>
-          <h2 className="mt-6 font-display text-3xl italic">{user?.fullName || localUser.name}</h2>
+          <h2 className="mt-6 font-display text-3xl italic">
+            {user?.fullName || localUser.name}
+          </h2>
           <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
             {user?.userName || localUser.handle}
           </p>
-          {!user && <p className="mt-6 text-sm leading-relaxed text-ink/80">{localUser.bio}</p>}
+          {!user && (
+            <p className="mt-6 text-sm leading-relaxed text-ink/80">
+              {localUser.bio}
+            </p>
+          )}
           <ul className="mt-8 flex flex-col gap-3 border-t border-ink/10 pt-6 text-sm text-ink/80">
             <li className="flex items-center gap-3">
               <Mail className="size-4 text-detail" strokeWidth={1.25} />
@@ -99,9 +155,14 @@ function ProfilePage() {
                 to={to}
                 className="group bg-canvas p-6 transition-colors hover:bg-surface"
               >
-                <Icon className="size-5 text-detail group-hover:text-clay" strokeWidth={1.25} />
+                <Icon
+                  className="size-5 text-detail group-hover:text-clay"
+                  strokeWidth={1.25}
+                />
                 <p className="mt-4 font-display text-4xl italic">{value}</p>
-                <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-detail">{label}</p>
+                <p className="mt-1 text-[11px] uppercase tracking-[0.22em] text-detail">
+                  {label}
+                </p>
               </Link>
             ))}
           </div>

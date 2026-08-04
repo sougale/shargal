@@ -8,7 +8,8 @@ export const Route = createFileRoute("/admin")({
       { title: "Console — Sharjahbiennial Admin" },
       {
         name: "description",
-        content: "Operational control center for the Sharjahbiennial exhibition and wallet.",
+        content:
+          "Operational control center for the Sharjahbiennial exhibition and wallet.",
       },
       { name: "robots", content: "noindex,nofollow" },
     ],

@@ -25,6 +25,7 @@ import { useAuctionAutoCloser } from "@/hooks/useAuctionAutoCloser";
 import { WalletLoader } from "@/components/wallet/WalletLoader";
 import { WalletError } from "@/components/wallet/WalletError";
 import type { WalletAccount } from "@/types/walletTypes";
+import { useEffect } from "react";
 // IMPORTANT: Do NOT import or call React Query hooks directly in this file.
 // All useQuery / useFirebaseQueryCollection calls must happen inside components rendered *after* <QueryClientProvider>.
 
@@ -45,10 +46,15 @@ function NotFoundComponent() {
       {/* <MegaNav /> */}
       <div className="flex flex-1 items-center justify-center px-6 py-32">
         <div className="max-w-md text-center">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-detail">404</p>
-          <h1 className="mt-6 font-display text-6xl italic text-ink">Lost in the gallery</h1>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
+            404
+          </p>
+          <h1 className="mt-6 font-display text-6xl italic text-ink">
+            Lost in the gallery
+          </h1>
           <p className="mt-6 text-detail">
-            The page you're looking for doesn't exist, or has been moved to another wall.
+            The page you're looking for doesn't exist, or has been moved to
+            another wall.
           </p>
           <Link
             to="/"
@@ -77,8 +83,12 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-screen items-center justify-center px-6">
       <div className="max-w-md text-center">
-        <h1 className="font-display text-4xl italic text-ink">This page didn't load</h1>
-        <p className="mt-4 text-sm text-detail">Something went wrong on our end.</p>
+        <h1 className="font-display text-4xl italic text-ink">
+          This page didn't load
+        </h1>
+        <p className="mt-4 text-sm text-detail">
+          Something went wrong on our end.
+        </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <button
             onClick={() => {
@@ -101,48 +111,57 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
-    meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Sharjahbiennial — A Curated Exhibition of Contemporary Artworks" },
-      {
-        name: "description",
-        content:
-          "A curated digital exhibition of paintings, sculpture, photography and digital works from a small circle of contemporary artists.",
-      },
-      { name: "author", content: "sharjahbiennial" },
-      {
-        property: "og:title",
-        content: "Sharjahbiennial — A Curated Exhibition",
-      },
-      {
-        property: "og:description",
-        content: "Quiet, considered works from a small circle of contemporary artists.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&display=swap",
-      },
-    ],
-  }),
-  shellComponent: RootShell,
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
+  {
+    // This runs on EVERY navigation.
+    // If the user is an admin, they are ONLY allowed to be on /admin routes.
+    // beforeLoad: enforceAdminOnly,
+    head: () => ({
+      meta: [
+        { charSet: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          title:
+            "Sharjahbiennial — A Curated Exhibition of Contemporary Artworks",
+        },
+        {
+          name: "description",
+          content:
+            "A curated digital exhibition of paintings, sculpture, photography and digital works from a small circle of contemporary artists.",
+        },
+        { name: "author", content: "sharjahbiennial" },
+        {
+          property: "og:title",
+          content: "Sharjahbiennial — A Curated Exhibition",
+        },
+        {
+          property: "og:description",
+          content:
+            "Quiet, considered works from a small circle of contemporary artists.",
+        },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+      ],
+      links: [
+        { rel: "stylesheet", href: appCss },
+        { rel: "preconnect", href: "https://fonts.googleapis.com" },
+        {
+          rel: "preconnect",
+          href: "https://fonts.gstatic.com",
+          crossOrigin: "anonymous",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Work+Sans:wght@300;400;500;600&display=swap",
+        },
+      ],
+    }),
+    shellComponent: RootShell,
+    component: RootComponent,
+    notFoundComponent: NotFoundComponent,
+    errorComponent: ErrorComponent,
+  }
+);
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
@@ -196,9 +215,26 @@ function RootComponent() {
   // Firestore onSnapshot (via useAuthListener) updates the store very frequently.
   const loading = useAuthStore(selectAuthLoading, Object.is);
   const isAuthHydrated = useAuthStore(selectAuthHydrated, Object.is);
+  const currentUser = useAuthStore(selectUser, Object.is);
 
   // Block wallet subtree until we have resolved the user from Auth + Firestore.
   const showWalletLoader = isWallet && (loading || !isAuthHydrated);
+
+  // Safety net (after hydration):
+  // If the store later becomes an admin user while on a non-admin page
+  // (e.g. role was just granted, or late snapshot), force them to /admin.
+  // Primary enforcement is the root `beforeLoad: enforceAdminOnly` above.
+  const router = useRouter();
+  // useEffect(() => {
+  //   if (
+  //     isAuthHydrated &&
+  //     !loading &&
+  //     currentUser?.role === "admin" &&
+  //     !isAdmin
+  //   ) {
+  //     router.navigate({ to: "/admin", replace: true });
+  //   }
+  // }, [isAuthHydrated, loading, currentUser?.role, isAdmin, router]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -214,7 +250,11 @@ function RootComponent() {
               ) : isWallet ? (
                 <div className="wallet-theme flex min-h-screen flex-col">
                   {showWalletLoader ? (
-                    <WalletLoader fullscreen message="Loading your wallet" showSkeleton />
+                    <WalletLoader
+                      fullscreen
+                      message="Loading your wallet"
+                      showSkeleton
+                    />
                   ) : (
                     <Outlet />
                   )}

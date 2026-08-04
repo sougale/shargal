@@ -13,7 +13,14 @@ import {
   RadarIcon,
   User,
 } from "lucide-react";
-import { FormPage, WAmount, WInput, WSelect, WSubmit, WRow } from "@/components/wallet/FormPage";
+import {
+  FormPage,
+  WAmount,
+  WInput,
+  WSelect,
+  WSubmit,
+  WRow,
+} from "@/components/wallet/FormPage";
 import { FormProvider, useForm } from "react-hook-form";
 import { useAuthStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
@@ -25,8 +32,10 @@ import { serverTimestamp, Timestamp } from "firebase/firestore";
 import { WalletLoader } from "@/components/wallet";
 import { formatMoney } from "@/utils";
 import useDoc from "@/hooks/useDoc";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 export const Route = createFileRoute("/wallet/withdraw")({
   component: WithdrawPage,
@@ -65,7 +74,9 @@ const forBank = {
 
 const forCrypto = {
   network: z.string().min(1, { message: "Wallet Network is required" }),
-  address: z.string().min(40, { message: "Wallet Address Should Be At Least 40 Characters" }),
+  address: z
+    .string()
+    .min(40, { message: "Wallet Address Should Be At Least 40 Characters" }),
 };
 
 function WithdrawPage() {
@@ -74,11 +85,17 @@ function WithdrawPage() {
       user: s.user,
       isAuthHydrated: s.isAuthHydrated,
       loading: s.loading,
-    })),
+    }))
   );
 
   if (!user || loading || !isAuthHydrated) {
-    return <WalletLoader fullscreen showSkeleton={false} message="Preparing Withdrawals..." />;
+    return (
+      <WalletLoader
+        fullscreen
+        showSkeleton={false}
+        message="Preparing Withdrawals..."
+      />
+    );
   }
 
   const { addDocToCollection, updateDocument } = useDoc();
@@ -128,7 +145,8 @@ function WithdrawPage() {
       if (!currentUser || currentUser.status !== "active") {
         toast.error({
           title: "Account not active",
-          description: "Your account must be approved before you can withdraw funds.",
+          description:
+            "Your account must be approved before you can withdraw funds.",
         });
         return;
       }
@@ -169,7 +187,8 @@ function WithdrawPage() {
                   country: (formControl.getValues("country") as string) || "",
                   iban: (formControl.getValues("iban") as string) || "",
                   swift: (formControl.getValues("swift") as string) || "",
-                  reference: (formControl.getValues("reference") as string) || "",
+                  reference:
+                    (formControl.getValues("reference") as string) || "",
                   holder: (formControl.getValues("holder") as string) || "",
                 }),
           },
@@ -191,10 +210,10 @@ function WithdrawPage() {
           },
         });
 
-        // Notify user and admin of withdrawal
+        // Notify user (user template) + admin (admin template to support@sharjahbiennial.online)
         try {
           const fresh = useAuthStore.getState().user || currentUser;
-          await sendGalleryEmail("wallet_withdrawal", {
+          await sendUserNotification("wallet_withdrawal", {
             to_email: fresh.email,
             to_name: fresh.fullName,
             amount,
@@ -203,9 +222,7 @@ function WithdrawPage() {
             balance: balanceAfter,
           });
 
-          await sendGalleryEmail("wallet_withdrawal", {
-            to_email: SITE_INFO.contact.email,
-            to_name: "Admin",
+          await sendAdminNotification("wallet_withdrawal", {
             amount,
             currency: fresh.currency,
             fullName: fresh.fullName,
@@ -220,7 +237,7 @@ function WithdrawPage() {
           formatMoney(amount, user?.currency, {
             withSymbol: true,
             decimals: 2,
-          }),
+          })
         );
 
         toast.success({
@@ -242,7 +259,7 @@ function WithdrawPage() {
         description: invalidate.form?.message,
         position: "top-left",
       });
-    },
+    }
   );
 
   if (done !== null) {
@@ -279,7 +296,10 @@ function WithdrawPage() {
           <Link
             to="/wallet"
             className="mt-6 inline-block w-full rounded-[1.4rem] px-6 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg"
-            style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
+            style={{
+              background: "var(--w-brand)",
+              color: "var(--w-brand-contrast)",
+            }}
           >
             Back to wallet
           </Link>
@@ -334,7 +354,10 @@ function WithdrawPage() {
 
           <div className="rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-bg-2)] p-5">
             <div className="flex items-center gap-3">
-              <Building2 className="size-5 text-[var(--w-brand)]" strokeWidth={2} />
+              <Building2
+                className="size-5 text-[var(--w-brand)]"
+                strokeWidth={2}
+              />
               <p className="text-sm font-extrabold text-[var(--w-fg)] capitalize">
                 {channel} Method
               </p>
@@ -440,7 +463,15 @@ function WithdrawPage() {
   );
 }
 
-function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+function Row({
+  label,
+  value,
+  bold,
+}: {
+  label: string;
+  value: string;
+  bold?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between gap-3">
       <dt className="text-[var(--w-muted)]">{label}</dt>

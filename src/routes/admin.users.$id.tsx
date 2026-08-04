@@ -40,7 +40,11 @@ import {
   X,
   Pause,
 } from "lucide-react";
-import { BentoCard, DataTable, StatusChip } from "@/components/admin/primitives";
+import {
+  BentoCard,
+  DataTable,
+  StatusChip,
+} from "@/components/admin/primitives";
 import { RecordSheet, type FieldDef } from "@/components/admin/RecordSheet";
 import {
   getUserActivity,
@@ -63,7 +67,10 @@ import { ToastPosition } from "@/components/ui/toast";
 import { doc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { AdminLoader } from "@/components/admin/AdminLoader";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 import { SITE_INFO } from "@/lib/siteInfo";
 
 export const Route = createFileRoute("/admin/users/$id")({
@@ -81,15 +88,16 @@ type SheetTarget =
   | null;
 
 function UserDetail() {
-  const { users, userAuctions, transactions, userBids, storeListings } = useDataStore(
-    useShallow((s) => ({
-      users: s.users,
-      userAuctions: s.auctions,
-      transactions: s.transactions,
-      userBids: s.bids,
-      storeListings: s.listings,
-    })),
-  );
+  const { users, userAuctions, transactions, userBids, storeListings } =
+    useDataStore(
+      useShallow((s) => ({
+        users: s.users,
+        userAuctions: s.auctions,
+        transactions: s.transactions,
+        userBids: s.bids,
+        storeListings: s.listings,
+      }))
+    );
   const { id } = useParams({ from: "/admin/users/$id" });
   const currentUser = users.find((u) => u.id == id);
 
@@ -143,7 +151,10 @@ function UserDetail() {
       key: "status",
       label: "Status",
       kind: "select",
-      options: ["active", "pending", "suspended"].map((v) => ({ value: v, label: v })),
+      options: ["active", "pending", "suspended"].map((v) => ({
+        value: v,
+        label: v,
+      })),
     },
     { key: "wallet.balance", label: "Wallet balance", kind: "money" },
     { key: "wallet.bidBalance", label: "Wallet Bid Balance", kind: "money" },
@@ -158,7 +169,12 @@ function UserDetail() {
   const { toast } = useToast();
   const { updateDocument, addDocToCollection, deleteDocument } = useDoc();
 
-  const errorToast = (error: any, position?: ToastPosition, description?: string, action?: any) => {
+  const errorToast = (
+    error: any,
+    position?: ToastPosition,
+    description?: string,
+    action?: any
+  ) => {
     toast({
       title: "Error",
       description: description || error.message,
@@ -191,7 +207,7 @@ function UserDetail() {
 
   const openImages = (
     e: MouseEvent<HTMLDivElement>,
-    { id, images }: { id: string; images: string[] },
+    { id, images }: { id: string; images: string[] }
   ) => {
     if (images.length) setImagesHover(images);
     if (id) {
@@ -232,7 +248,12 @@ function UserDetail() {
         subMessage="Fetching profile & activity"
       />
 
-      <AdminLoader fullscreen variant="action" isLoading={actionLoading} message={actionMessage} />
+      <AdminLoader
+        fullscreen
+        variant="action"
+        isLoading={actionLoading}
+        message={actionMessage}
+      />
 
       {/* Identity card */}
       <motion.div
@@ -263,7 +284,8 @@ function UserDetail() {
                 <Mail className="size-3" /> {currentUser.email}
               </span>
               <span className="inline-flex items-center gap-1.5">
-                <Calendar className="size-3" /> Joined {fmtDateTime(currentUser.joinedDate)}
+                <Calendar className="size-3" /> Joined{" "}
+                {fmtDateTime(currentUser.joinedDate)}
               </span>
               {/* <span className="inline-flex items-center gap-1.5">
                 <MapPin className="size-3" /> Lisbon, PT
@@ -348,9 +370,9 @@ function UserDetail() {
                   },
                 });
 
-                // Notify user their account is now active
+                // Notify user their account is now active (user template)
                 try {
-                  await sendGalleryEmail("account_activated", {
+                  await sendUserNotification("account_activated", {
                     to_email: currentUser.email,
                     to_name: currentUser.fullName,
                     fullName: currentUser.fullName,
@@ -392,7 +414,7 @@ function UserDetail() {
                 });
 
                 try {
-                  await sendGalleryEmail("account_suspended", {
+                  await sendUserNotification("account_suspended", {
                     to_email: currentUser.email,
                     to_name: currentUser.fullName,
                     fullName: currentUser.fullName,
@@ -416,8 +438,15 @@ function UserDetail() {
 
       {/* Wallet KPIs */}
       <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <WalletStat label="Balance" value={fmtMoney(currentUser.wallet.balance)} accent />
-        <WalletStat label="Bid Balance" value={fmtMoney(currentUser.wallet.bidBalance)} />
+        <WalletStat
+          label="Balance"
+          value={fmtMoney(currentUser.wallet.balance)}
+          accent
+        />
+        <WalletStat
+          label="Bid Balance"
+          value={fmtMoney(currentUser.wallet.bidBalance)}
+        />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-12">
@@ -490,8 +519,12 @@ function UserDetail() {
                       />
                     )}
                     <div>
-                      <p className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</p>
-                      <p className="a-mono text-[10px] text-[var(--a-muted)]">{r.sellerSlug}</p>
+                      <p className="text-xs font-semibold text-[var(--a-fg)]">
+                        {r.title}
+                      </p>
+                      <p className="a-mono text-[10px] text-[var(--a-muted)]">
+                        {r.sellerSlug}
+                      </p>
                     </div>
                   </div>
                 ),
@@ -545,7 +578,9 @@ function UserDetail() {
                     <span className="grid size-7 place-items-center rounded bg-[var(--a-surface-2)] text-[var(--a-accent)]">
                       <Hammer className="size-3" />
                     </span>
-                    <span className="text-xs font-semibold text-[var(--a-fg)]">{r.lotTitle}</span>
+                    <span className="text-xs font-semibold text-[var(--a-fg)]">
+                      {r.lotTitle}
+                    </span>
                   </div>
                 ),
               },
@@ -558,12 +593,18 @@ function UserDetail() {
                   </span>
                 ),
               },
-              { key: "status", header: "Status", render: (r) => <StatusChip value={"Leading"} /> },
+              {
+                key: "status",
+                header: "Status",
+                render: (r) => <StatusChip value={"Leading"} />,
+              },
               {
                 key: "at",
                 header: "When",
                 render: (r) => (
-                  <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.placedAt)}</span>
+                  <span className="text-xs text-[var(--a-muted)]">
+                    {fmtDateTime(r.placedAt)}
+                  </span>
                 ),
               },
             ]}
@@ -579,7 +620,8 @@ function UserDetail() {
           action={
             <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--a-accent)]">
               <Package className="size-3" />{" "}
-              {listings.filter((l) => l.userID == currentUser.userID).length} total
+              {listings.filter((l) => l.userID == currentUser.userID).length}{" "}
+              total
             </span>
           }
         >
@@ -600,7 +642,9 @@ function UserDetail() {
                       />
                     )}
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[var(--a-fg)] truncate">{r.title}</p>
+                      <p className="text-xs font-semibold text-[var(--a-fg)] truncate">
+                        {r.title}
+                      </p>
                       <p className="a-mono text-[10px] text-[var(--a-muted)] truncate">
                         {r.category}
                       </p>
@@ -658,7 +702,9 @@ function UserDetail() {
                 key: "fullName",
                 header: "Full Name",
                 render: (r) => (
-                  <span className="a-mono text-xs text-[var(--a-muted)]">{r.fullName}</span>
+                  <span className="a-mono text-xs text-[var(--a-muted)]">
+                    {r.fullName}
+                  </span>
                 ),
               },
               {
@@ -673,7 +719,11 @@ function UserDetail() {
               {
                 key: "method",
                 header: "Method",
-                render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.channel}</span>,
+                render: (r) => (
+                  <span className="text-xs text-[var(--a-fg-2)]">
+                    {r.channel}
+                  </span>
+                ),
               },
               {
                 key: "amount",
@@ -684,12 +734,18 @@ function UserDetail() {
                   </span>
                 ),
               },
-              { key: "status", header: "Status", render: (r) => <StatusChip value={r.status} /> },
+              {
+                key: "status",
+                header: "Status",
+                render: (r) => <StatusChip value={r.status} />,
+              },
               {
                 key: "at",
                 header: "When",
                 render: (r) => (
-                  <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.createdAt)}</span>
+                  <span className="text-xs text-[var(--a-muted)]">
+                    {fmtDateTime(r.createdAt)}
+                  </span>
                 ),
               },
             ]}
@@ -737,10 +793,11 @@ function UserDetail() {
                     document: {
                       id: target.row.userID,
                       wallet: {
-                        balance: currentUser.wallet.balance + target.row.bidAmount,
+                        balance:
+                          currentUser.wallet.balance + target.row.bidAmount,
                         bidBalance: Math.max(
                           0,
-                          currentUser.wallet.bidBalance - target.row.bidAmount,
+                          currentUser.wallet.bidBalance - target.row.bidAmount
                         ),
                       },
                     },
@@ -783,7 +840,9 @@ function UserDetail() {
                   return;
                 }
 
-                setActionMessage("Closing auction and transferring ownership...");
+                setActionMessage(
+                  "Closing auction and transferring ownership..."
+                );
                 setActionLoading(true);
                 try {
                   //for current Bidder..deduct from bidding balance
@@ -795,14 +854,16 @@ function UserDetail() {
                         balance: currentUser.wallet.balance,
                         bidBalance: Math.max(
                           0,
-                          currentUser.wallet.bidBalance - target.row.bidAmount,
+                          currentUser.wallet.bidBalance - target.row.bidAmount
                         ),
                       },
                     },
                   });
 
                   //for original owner...add to the wallet balance
-                  const originalUser = await getDoc(doc(db, "users", Lot.userID));
+                  const originalUser = await getDoc(
+                    doc(db, "users", Lot.userID)
+                  );
 
                   if (originalUser.exists()) {
                     const data = originalUser.data() as WalletAccount;
@@ -908,17 +969,21 @@ function UserDetail() {
                   } catch (e) {
                     console.warn(
                       "[activity] failed to record purchase/sale tx from user detail",
-                      e,
+                      e
                     );
                   }
 
                   // Email notifications
                   try {
                     const winner = currentUser; // the bidder in this context
-                    const sellerSnap = await getDoc(doc(db, "users", Lot.userID));
-                    const seller = sellerSnap.exists() ? (sellerSnap.data() as any) : null;
+                    const sellerSnap = await getDoc(
+                      doc(db, "users", Lot.userID)
+                    );
+                    const seller = sellerSnap.exists()
+                      ? (sellerSnap.data() as any)
+                      : null;
 
-                    await sendGalleryEmail("auction_won", {
+                    await sendUserNotification("auction_won", {
                       to_email: winner.email,
                       to_name: winner.fullName,
                       lotTitle: Lot.title,
@@ -929,7 +994,7 @@ function UserDetail() {
                     });
 
                     if (seller?.email) {
-                      await sendGalleryEmail("auction_sold_to_seller", {
+                      await sendUserNotification("auction_sold_to_seller", {
                         to_email: seller.email,
                         to_name: seller.fullName,
                         lotTitle: Lot.title,
@@ -941,14 +1006,14 @@ function UserDetail() {
                       });
                     }
 
-                    await sendGalleryEmail("auction_won", {
-                      to_email: SITE_INFO.contact.email,
-                      to_name: "Admin",
+                    // Admin gets the distinct admin template at support@sharjahbiennial.online
+                    await sendAdminNotification("auction_won", {
                       lotTitle: Lot.title,
                       slug: Lot.slug,
                       finalPrice: target.row.bidAmount,
                       auctionID: Lot.id,
                       winnerName: winner.fullName,
+                      sellerName: seller?.fullName || Lot.sellerSlug,
                     });
                   } catch (e) {
                     console.warn("[email] close bid notification failed", e);
@@ -1123,7 +1188,10 @@ function UserDetail() {
           }}
           extra={
             target.row.images.length && (
-              <AuctionImageSwiper images={target.row.images} alt={currentUser.fullName} />
+              <AuctionImageSwiper
+                images={target.row.images}
+                alt={currentUser.fullName}
+              />
             )
           }
           // operations={}
@@ -1141,7 +1209,10 @@ function UserDetail() {
           fields={listingFields}
           extra={
             target.row.images?.length ? (
-              <AuctionImageSwiper images={target.row.images} alt={target.row.title} />
+              <AuctionImageSwiper
+                images={target.row.images}
+                alt={target.row.title}
+              />
             ) : undefined
           }
           onSave={async (p) => {
@@ -1222,7 +1293,12 @@ const bidFields: FieldDef<Bid>[] = [
   //     { value: "lost", label: "Lost" },
   //   ],
   // },
-  { key: "placedAt", label: "Placed at", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+  {
+    key: "placedAt",
+    label: "Placed at",
+    kind: "readonly",
+    render: (v) => fmtDateTime(String(v)),
+  },
 ];
 
 const orderFields: FieldDef<UserOrder>[] = [
@@ -1242,7 +1318,12 @@ const orderFields: FieldDef<UserOrder>[] = [
       { value: "refunded", label: "Refunded" },
     ],
   },
-  { key: "at", label: "Placed at", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+  {
+    key: "at",
+    label: "Placed at",
+    kind: "readonly",
+    render: (v) => fmtDateTime(String(v)),
+  },
 ];
 
 const txFields: FieldDef<WalletTx>[] = [
@@ -1276,7 +1357,12 @@ const txFields: FieldDef<WalletTx>[] = [
       { value: "On Hold", label: "On Hold" },
     ],
   },
-  { key: "createdAt", label: "Created", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+  {
+    key: "createdAt",
+    label: "Created",
+    kind: "readonly",
+    render: (v) => fmtDateTime(String(v)),
+  },
 ];
 const auctionFields: FieldDef<AuctionLot>[] = [
   { key: "title", label: "Lot title", span: 2 },
@@ -1330,7 +1416,12 @@ const favFields: FieldDef<UserFavourite & { id: string }>[] = [
 const noteFields: FieldDef<UserNote>[] = [
   { key: "id", label: "Note ID", kind: "readonly" },
   { key: "author", label: "Author", editable: true },
-  { key: "at", label: "Created", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+  {
+    key: "at",
+    label: "Created",
+    kind: "readonly",
+    render: (v) => fmtDateTime(String(v)),
+  },
   { key: "body", label: "Body", kind: "textarea", editable: true, span: 2 },
 ];
 
@@ -1343,16 +1434,42 @@ const listingFields: FieldDef<Listing>[] = [
   { key: "dimensions", label: "Dimensions", editable: true },
   { key: "condition", label: "Condition", editable: true },
   { key: "provenance", label: "Provenance", kind: "textarea", editable: true },
-  { key: "description", label: "Description", kind: "textarea", span: 2, editable: true },
+  {
+    key: "description",
+    label: "Description",
+    kind: "textarea",
+    span: 2,
+    editable: true,
+  },
   { key: "bidAmount", label: "Price", kind: "money", editable: true },
   { key: "status", label: "Status", editable: true },
-  { key: "createdAt", label: "Created", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
-  { key: "placedAt", label: "Placed at", kind: "readonly", render: (v) => fmtDateTime(String(v)) },
+  {
+    key: "createdAt",
+    label: "Created",
+    kind: "readonly",
+    render: (v) => fmtDateTime(String(v)),
+  },
+  {
+    key: "placedAt",
+    label: "Placed at",
+    kind: "readonly",
+    render: (v) => fmtDateTime(String(v)),
+  },
 ];
 
-function WalletStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+function WalletStat({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
   return (
-    <div className={`a-card-elev p-4 ${accent ? "ring-1 ring-[var(--a-accent)]/40" : ""}`}>
+    <div
+      className={`a-card-elev p-4 ${accent ? "ring-1 ring-[var(--a-accent)]/40" : ""}`}
+    >
       <p className="a-eyebrow">{label}</p>
       <p
         className={`font-display mt-1.5 text-2xl font-extrabold tracking-tight ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-fg)]"}`}

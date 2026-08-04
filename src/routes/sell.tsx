@@ -18,8 +18,10 @@ import { getUserName, photoFN } from "@/utils";
 import useDoc from "@/hooks/useDoc";
 import { toast } from "@/lib/useToast";
 import { EMPTY_TEXT } from "@/lib/emptyState";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 import { Loader } from "@/components/site/Loader";
 import { AuctionImageSwiper } from "@/components/site/AuctionImageSwiper";
 import { formatMoney } from "@/lib/wallet";
@@ -28,7 +30,8 @@ export const Route = createFileRoute("/sell")({
   component: SellPage,
   head: () => ({ meta: [{ title: "Sell your work — sharjahbiennial" }] }),
   validateSearch: (search: Record<string, unknown>) => ({
-    fromListing: typeof search.fromListing === "string" ? search.fromListing : undefined,
+    fromListing:
+      typeof search.fromListing === "string" ? search.fromListing : undefined,
   }),
 });
 
@@ -77,7 +80,9 @@ const auctionSchema = z.object({
   year: z
     .number()
     .min(1950, { message: "Year Must Not Go Below 1950" })
-    .max(new Date().getFullYear(), { message: "Current Year Is The Year Of Upload" }),
+    .max(new Date().getFullYear(), {
+      message: "Current Year Is The Year Of Upload",
+    }),
   medium: z.string().min(1, { message: "Medium is required" }),
   dimensions: z.string().min(1, { message: "Dimensions is required" }),
   description: z.string().min(1, { message: "Description is required" }),
@@ -93,7 +98,7 @@ const auctionSchema = z.object({
         })
         .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), {
           message: "Only .jpg, .jpeg, and .png formats are supported.",
-        }),
+        })
     )
     .optional()
     .default([]),
@@ -135,7 +140,7 @@ function SellPage() {
   const { auctions } = useDataStore(
     useShallow((s) => ({
       auctions: s.auctions,
-    })),
+    }))
   );
 
   const { user, loading, isAuthHydrated } = useAuthStore(
@@ -143,7 +148,7 @@ function SellPage() {
       user: s.user,
       loading: s.loading,
       isAuthHydrated: s.isAuthHydrated,
-    })),
+    }))
   );
 
   // Primitive status selector — when admin approves/suspends via onSnapshot,
@@ -199,7 +204,8 @@ function SellPage() {
   } = formControl;
 
   // Watch for new image uploads so we can drop kept images when user starts uploading replacements
-  const watchedImages = useWatch({ name: "images", control: formControl.control }) || [];
+  const watchedImages =
+    useWatch({ name: "images", control: formControl.control }) || [];
 
   useEffect(() => {
     formControl.trigger("images");
@@ -227,22 +233,37 @@ function SellPage() {
       shouldValidate: true,
     });
     setValue("medium", sourceListing.medium || "", { shouldValidate: true });
-    setValue("dimensions", sourceListing.dimensions || "", { shouldValidate: true });
-    setValue("description", sourceListing.description || "", { shouldValidate: true });
-    setValue("provenance", sourceListing.provenance || "", { shouldValidate: true });
-    setValue("condition", sourceListing.condition || "", { shouldValidate: true });
+    setValue("dimensions", sourceListing.dimensions || "", {
+      shouldValidate: true,
+    });
+    setValue("description", sourceListing.description || "", {
+      shouldValidate: true,
+    });
+    setValue("provenance", sourceListing.provenance || "", {
+      shouldValidate: true,
+    });
+    setValue("condition", sourceListing.condition || "", {
+      shouldValidate: true,
+    });
     // Match the select option values (lowercase)
-    setValue("category", catRaw ? catRaw.toLowerCase() : "painting", { shouldValidate: true });
+    setValue("category", catRaw ? catRaw.toLowerCase() : "painting", {
+      shouldValidate: true,
+    });
 
     // Money fields - fall back to winning bid
-    setValue("estimateLow", Math.max(100, Math.floor(bid * 0.8)) || 1000, { shouldValidate: true });
+    setValue("estimateLow", Math.max(100, Math.floor(bid * 0.8)) || 1000, {
+      shouldValidate: true,
+    });
     setValue("estimateHigh", Math.max(200, Math.floor(bid * 1.3)) || 1500, {
       shouldValidate: true,
     });
     setValue("startBid", Math.max(100, bid) || 1000, { shouldValidate: true });
     setValue("endsAt", 48, { shouldValidate: true });
 
-    if (Array.isArray(sourceListing.images) && sourceListing.images.length > 0) {
+    if (
+      Array.isArray(sourceListing.images) &&
+      sourceListing.images.length > 0
+    ) {
       setKeptPreloaded(sourceListing.images);
       // Show a reasonable number of upload slots in case user wants to replace
       setImagesIndex(Math.min(3, Math.max(1, sourceListing.images.length)));
@@ -260,8 +281,12 @@ function SellPage() {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-6">
         <div className="max-w-md text-center">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Consign</p>
-          <h1 className="mt-3 font-display text-4xl italic text-ink">Sign in to sell</h1>
+          <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+            Consign
+          </p>
+          <h1 className="mt-3 font-display text-4xl italic text-ink">
+            Sign in to sell
+          </h1>
           <p className="mt-3 text-sm text-detail">
             You need an account to list artwork for exhibition.
           </p>
@@ -324,14 +349,24 @@ function SellPage() {
       //   name: "price",
       //   format: "money" as const,
       // },
-      { fieldType: "input", label: "Estimate Low", name: "estimateLow", format: "money" as const },
+      {
+        fieldType: "input",
+        label: "Estimate Low",
+        name: "estimateLow",
+        format: "money" as const,
+      },
       {
         fieldType: "input",
         label: "Estimate High",
         name: "estimateHigh",
         format: "money" as const,
       },
-      { fieldType: "input", label: "Start Bid", name: "startBid", format: "money" as const },
+      {
+        fieldType: "input",
+        label: "Start Bid",
+        name: "startBid",
+        format: "money" as const,
+      },
       // { fieldType: "input", label: "Current Bid", name: "currentBid", format: "money" as const },
       {
         fieldType: "select",
@@ -352,7 +387,10 @@ function SellPage() {
         fieldType: "textarea",
         label: "Description",
         name: "description",
-        attrs: { placeholder: "A few sentences about the work, its materials, and its making." },
+        attrs: {
+          placeholder:
+            "A few sentences about the work, its materials, and its making.",
+        },
       },
     ] as FieldProps["fields"]
   ).map((f) => ({
@@ -369,7 +407,8 @@ function SellPage() {
       if (!currentUser || currentUser.status !== "active") {
         toast.error({
           title: "Account not active",
-          description: "Your account must be approved before you can submit listings for sale.",
+          description:
+            "Your account must be approved before you can submit listings for sale.",
         });
         setLoadingForm(false);
         return;
@@ -385,7 +424,9 @@ function SellPage() {
 
       try {
         if (newFiles.length > 0) {
-          finalImages = await Promise.all([...newFiles].map(async (f) => await photoFN(f)));
+          finalImages = await Promise.all(
+            [...newFiles].map(async (f) => await photoFN(f))
+          );
         } else if (keptPreloaded.length > 0) {
           finalImages = [...keptPreloaded];
         }
@@ -393,7 +434,8 @@ function SellPage() {
         if (finalImages.length === 0) {
           toast.error({
             title: "Images required",
-            description: "Please upload at least one image or reuse the images from your listing.",
+            description:
+              "Please upload at least one image or reuse the images from your listing.",
           });
           setLoadingForm(false);
           return;
@@ -407,7 +449,9 @@ function SellPage() {
           currentBid: 0,
           description: getValues("description"),
           dimensions: getValues("dimensions"),
-          endsAt: inHours(isNaN(getValues("endsAt")) ? 0 : Number(getValues("endsAt"))),
+          endsAt: inHours(
+            isNaN(getValues("endsAt")) ? 0 : Number(getValues("endsAt"))
+          ),
           estimateHigh: getValues("estimateHigh"),
           estimateLow: getValues("estimateLow"),
           images: finalImages,
@@ -431,9 +475,9 @@ function SellPage() {
           document: payload,
         });
 
-        // Notify user and admin of new listing submission
+        // Notify user (their email) + admin (support@sharjahbiennial.online with admin template)
         try {
-          await sendGalleryEmail("listing_submitted", {
+          await sendUserNotification("listing_submitted", {
             to_email: currentUser.email,
             to_name: currentUser.fullName,
             title: getValues("title"),
@@ -445,15 +489,15 @@ function SellPage() {
             fullName: currentUser.fullName,
           });
 
-          await sendGalleryEmail("admin_new_listing", {
-            to_email: SITE_INFO.contact.email,
-            to_name: "Admin",
+          await sendAdminNotification("listing_submitted", {
             title: getValues("title"),
             slug: payload.slug,
             bidAmount: getValues("startBid"),
             category: getValues("category"),
             medium: getValues("medium"),
+            year: getValues("year"),
             fullName: currentUser.fullName,
+            email: currentUser.email,
           });
         } catch (e) {
           console.warn("[email] listing notification failed", e);
@@ -487,12 +531,13 @@ function SellPage() {
 
       Object.keys(invalidate).forEach((k) => {
         toast.reserved({
-          title: invalidate[k as keyof typeof invalidate]?.message || EMPTY_TEXT,
+          title:
+            invalidate[k as keyof typeof invalidate]?.message || EMPTY_TEXT,
           description: "Invalid Form Fields",
           position: "top-left",
         });
       });
-    },
+    }
   );
 
   // Show a helpful banner when coming from "Edit & Re-auction"
@@ -524,8 +569,10 @@ function SellPage() {
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-32 pt-6 ">
         {isReListing && (
           <div className="-mb-6 rounded border border-clay/40 bg-clay/5 px-4 py-3 text-sm text-clay">
-            Re-listing <span className="font-medium">{sourceListing?.title}</span>. The previous
-            images are pre-selected below. You can keep them or replace by uploading new ones.
+            Re-listing{" "}
+            <span className="font-medium">{sourceListing?.title}</span>. The
+            previous images are pre-selected below. You can keep them or replace
+            by uploading new ones.
           </div>
         )}
 
@@ -535,48 +582,53 @@ function SellPage() {
 
             {/* Image Uploader */}
             <div className="space-y-3">
-              <ImageUploader slotCount={imagesIndex} onSlotCountChange={setImagesIndex} />
+              <ImageUploader
+                slotCount={imagesIndex}
+                onSlotCountChange={setImagesIndex}
+              />
 
               {/* Show reused images from the won listing when user clicked "Edit & Re-auction" */}
-              {keptPreloaded.length > 0 && (watchedImages?.length || 0) === 0 && (
-                <div className="border border-ink/20 bg-surface/40 p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                      Reusing images from your won listing ({keptPreloaded.length})
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setKeptPreloaded([]);
-                        setImagesIndex(1);
-                      }}
-                      className="text-[10px] uppercase tracking-[0.18em] border border-ink/30 px-2 py-0.5 hover:bg-ink hover:text-canvas"
-                    >
-                      Clear &amp; upload new
-                    </button>
-                  </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                    {keptPreloaded.map((src, i) => (
-                      <div
-                        key={i}
-                        className="aspect-[4/3] overflow-hidden border border-ink/10 bg-surface"
+              {keptPreloaded.length > 0 &&
+                (watchedImages?.length || 0) === 0 && (
+                  <div className="border border-ink/20 bg-surface/40 p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                        Reusing images from your won listing (
+                        {keptPreloaded.length})
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setKeptPreloaded([]);
+                          setImagesIndex(1);
+                        }}
+                        className="text-[10px] uppercase tracking-[0.18em] border border-ink/30 px-2 py-0.5 hover:bg-ink hover:text-canvas"
                       >
-                        <img
-                          src={src}
-                          alt={`Previous view ${i + 1}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                        Clear &amp; upload new
+                      </button>
+                    </div>
 
-                  <p className="mt-2 text-[10px] text-detail/70">
-                    These images will be used for the new auction. Upload new images above to
-                    replace them.
-                  </p>
-                </div>
-              )}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {keptPreloaded.map((src, i) => (
+                        <div
+                          key={i}
+                          className="aspect-[4/3] overflow-hidden border border-ink/10 bg-surface"
+                        >
+                          <img
+                            src={src}
+                            alt={`Previous view ${i + 1}`}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="mt-2 text-[10px] text-detail/70">
+                      These images will be used for the new auction. Upload new
+                      images above to replace them.
+                    </p>
+                  </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -630,7 +682,9 @@ function Field({
 }) {
   return (
     <label className={`flex flex-col gap-2 ${className}`}>
-      <span className="text-[10px] uppercase tracking-[0.22em] text-detail">{label}</span>
+      <span className="text-[10px] uppercase tracking-[0.22em] text-detail">
+        {label}
+      </span>
       {children}
     </label>
   );

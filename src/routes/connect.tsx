@@ -34,6 +34,31 @@ function ConnectPage() {
   const [loading, setLoading] = useState(false);
   const { loginUser, logOut } = useAuth();
 
+  // Always send authenticated admins straight to the admin console.
+  // Covers: arriving on /connect while already logged in as admin,
+  // and right after a successful admin login.
+  // useEffect(() => {
+  //   if (connected?.role === "admin") {
+  //     navigate({ to: "/admin", replace: true });
+  //   }
+  // }, [connected?.role, navigate]);
+
+  // If already connected as admin, don't render the normal connect UI at all.
+  // if (connected?.role === "admin") {
+  //   return (
+  //     <div className="flex min-h-[60vh] items-center justify-center">
+  //       <div className="text-center">
+  //         <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
+  //           Administrator
+  //         </p>
+  //         <p className="mt-2 font-display text-2xl italic">
+  //           Redirecting to Console…
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
+
   const formControl = useForm({
     resolver: zodResolver(tokenSchema),
     mode: "onBlur",
@@ -62,7 +87,8 @@ function ConnectPage() {
 
       if (!acc) {
         setError("token", {
-          message: "Please Make Sure You Enter A Valid Token From Your Wallet Account",
+          message:
+            "Please Make Sure You Enter A Valid Token From Your Wallet Account",
         });
         setTimeout(() => {
           toast.error({
@@ -74,14 +100,12 @@ function ConnectPage() {
       }
       console.log(acc);
 
-      await loginUser(acc.email, acc.password).catch((err) => {
-        toast.error({
-          title: "Error Message",
-          description: err.message,
-        });
-      });
+      await loginUser(acc.email, acc.password);
 
-      navigate({ to: "/profile" });
+      // Admins land in the admin console; everyone else goes to their profile
+      const dest = acc.role === "admin" ? "/admin" : "/profile";
+      navigate({ to: dest });
+
       toast.default({
         title: "Success",
         description: "Wallet Successfully Connected",
@@ -131,11 +155,17 @@ function ConnectPage() {
             <div>
               <div className="flex items-center gap-3 border-b border-ink/10 pb-5">
                 <CheckCircle2 className="size-5 text-clay" strokeWidth={1.4} />
-                <p className="text-[11px] uppercase tracking-[0.3em] text-clay">Wallet connected</p>
+                <p className="text-[11px] uppercase tracking-[0.3em] text-clay">
+                  Wallet connected
+                </p>
               </div>
-              <p className="mt-6 font-display text-3xl italic">{connected.fullName}</p>
+              <p className="mt-6 font-display text-3xl italic">
+                {connected.fullName}
+              </p>
               <p className="text-sm text-detail">{connected.email}</p>
-              <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">Balance</p>
+              <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">
+                Balance
+              </p>
               <p className="font-display text-4xl italic">{}</p>
 
               <div className="mt-8 flex flex-wrap gap-3">
@@ -171,7 +201,9 @@ function ConnectPage() {
                 <span className="grid size-10 place-items-center bg-clay/10 text-clay">
                   <KeyRound className="size-4" strokeWidth={1.5} />
                 </span>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-detail">Wallet token</p>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-detail">
+                  Wallet token
+                </p>
               </div>
 
               <input
@@ -199,7 +231,10 @@ function ConnectPage() {
 
               <p className="mt-5 text-xs text-detail">
                 Don't have a wallet?{" "}
-                <Link to="/wallet" className="text-ink underline underline-offset-4">
+                <Link
+                  to="/wallet"
+                  className="text-ink underline underline-offset-4"
+                >
                   Create one in under a minute →
                 </Link>
               </p>
@@ -214,7 +249,8 @@ function ConnectPage() {
           </div>
           <ol className="mt-6 flex flex-col gap-5 text-sm leading-relaxed text-ink/85">
             <Step n={1} title="Create a wallet">
-              Sign up for a free Sharjahbiennial Wallet — it lives alongside the exhibition.
+              Sign up for a free Sharjahbiennial Wallet — it lives alongside the
+              exhibition.
             </Step>
             <Step n={2} title="Copy your token">
               In Wallet → Security, copy your unique{" "}
@@ -224,7 +260,8 @@ function ConnectPage() {
               Paste the token above. The site is unlocked instantly.
             </Step>
             <Step n={4} title="Bid, buy, sell">
-              Auctions, checkout, and listings all flow through your wallet balance.
+              Auctions, checkout, and listings all flow through your wallet
+              balance.
             </Step>
           </ol>
         </aside>
@@ -235,7 +272,15 @@ function ConnectPage() {
 
 // Tiny helper to look up account by id without redoing the import dance
 
-function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+function Step({
+  n,
+  title,
+  children,
+}: {
+  n: number;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <li className="flex gap-4">
       <span className="grid size-7 shrink-0 place-items-center rounded-full border border-ink/20 font-display text-sm italic">

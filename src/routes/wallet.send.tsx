@@ -1,7 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "motion/react";
-import { Send, CheckCircle2, KeyRound, MessageSquare, Tag as TagIcon } from "lucide-react";
+import {
+  Send,
+  CheckCircle2,
+  KeyRound,
+  MessageSquare,
+  Tag as TagIcon,
+} from "lucide-react";
 
 import {
   FormPage,
@@ -26,6 +32,10 @@ import { WalletLoader } from "@/components/wallet/WalletLoader";
 import { toast } from "@/lib/useToast";
 import useDoc from "@/hooks/useDoc";
 import { serverTimestamp, Timestamp } from "firebase/firestore";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 export const Route = createFileRoute("/wallet/send")({
   component: SendPage,
@@ -53,7 +63,7 @@ function SendPage() {
       user: s.user,
       loading: s.loading,
       isAuthHydrated: s.isAuthHydrated,
-    })),
+    }))
   );
 
   const { addDocToCollection, updateDocument } = useDoc();
@@ -62,7 +72,9 @@ function SendPage() {
   const [purpose, setPurpose] = useState("gift");
 
   if (loading || !isAuthHydrated || !user) {
-    return <WalletLoader partial message="Preparing send" showSkeleton={false} />;
+    return (
+      <WalletLoader partial message="Preparing send" showSkeleton={false} />
+    );
   }
 
   const u: WalletAccount = user;
@@ -185,8 +197,14 @@ function SendPage() {
       };
 
       // Execute both operations
-      await addDocToCollection({ collections: "transactions", document: payloadSender });
-      await addDocToCollection({ collections: "transactions", document: payloadReceiver });
+      await addDocToCollection({
+        collections: "transactions",
+        document: payloadSender,
+      });
+      await addDocToCollection({
+        collections: "transactions",
+        document: payloadReceiver,
+      });
 
       // Update balances
       await updateDocument({
@@ -205,9 +223,10 @@ function SendPage() {
         },
       });
 
-      // Send transfer notifications to both parties + admin
+      // Send transfer notifications
+      // Sender and recipient get user templates; admin gets admin template
       try {
-        await sendGalleryEmail("wallet_withdrawal", {
+        await sendUserNotification("wallet_withdrawal", {
           to_email: currentUser.email,
           to_name: currentUser.fullName,
           amount: data.amount,
@@ -217,7 +236,7 @@ function SendPage() {
           fullName: currentUser.fullName,
         });
 
-        await sendGalleryEmail("wallet_deposit", {
+        await sendUserNotification("wallet_deposit", {
           to_email: recipient.email,
           to_name: recipient.fullName,
           amount: data.amount,
@@ -227,9 +246,7 @@ function SendPage() {
           fullName: recipient.fullName,
         });
 
-        await sendGalleryEmail("wallet_withdrawal", {
-          to_email: SITE_INFO.contact.email,
-          to_name: "Admin",
+        await sendAdminNotification("wallet_withdrawal", {
           amount: data.amount,
           currency: currentUser.currency,
           fullName: currentUser.fullName,
@@ -276,12 +293,16 @@ function SendPage() {
             {formatMoney(amount, u.currency)} sent
           </h1>
           <p className="mt-2 text-sm text-[var(--w-muted)]">
-            New balance: {formatMoney(u.wallet.balance ?? 0 - amount, u.currency)}
+            New balance:{" "}
+            {formatMoney(u.wallet.balance ?? 0 - amount, u.currency)}
           </p>
           <Link
             to="/wallet"
             className="mt-6 inline-block w-full rounded-[1.4rem] px-6 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg"
-            style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
+            style={{
+              background: "var(--w-brand)",
+              color: "var(--w-brand-contrast)",
+            }}
           >
             Back to Wallet
           </Link>
@@ -310,7 +331,10 @@ function SendPage() {
               <div className="mt-3 flex items-center gap-3">
                 <span
                   className="grid size-12 place-items-center rounded-full text-base font-extrabold"
-                  style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
+                  style={{
+                    background: "var(--w-brand)",
+                    color: "var(--w-brand-contrast)",
+                  }}
                 >
                   {recipient.fullName
                     .split(" ")
@@ -320,8 +344,12 @@ function SendPage() {
                     .toUpperCase()}
                 </span>
                 <div className="min-w-0">
-                  <p className="truncate font-extrabold">{recipient.fullName}</p>
-                  <p className="truncate text-xs text-[var(--w-muted)]">{recipient.email}</p>
+                  <p className="truncate font-extrabold">
+                    {recipient.fullName}
+                  </p>
+                  <p className="truncate text-xs text-[var(--w-muted)]">
+                    {recipient.email}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -340,7 +368,10 @@ function SendPage() {
       }
     >
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex flex-col gap-5"
+        >
           <WInput
             label="Recipient token"
             placeholder="AET-XXXX-XXXX-XXXX"
@@ -373,7 +404,10 @@ function SendPage() {
             placeholder="For the framing of the Marchand triptych…"
           />
 
-          <WSubmit type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>
+          <WSubmit
+            type="submit"
+            disabled={form.formState.isSubmitting || !form.formState.isValid}
+          >
             {/* <Send className="size-4" /> */}
             {/* Send {formatMoney(amount, u.currency)} */}
             Proceed

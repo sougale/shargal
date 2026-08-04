@@ -1,7 +1,22 @@
 import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
-import { Mail, Lock, User, Eye, EyeOff, ShieldCheck, Sparkles, List, Loader2 } from "lucide-react";
-import { Controller, FormProvider, useForm, useFormContext } from "react-hook-form";
+import {
+  Mail,
+  Lock,
+  User,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Sparkles,
+  List,
+  Loader2,
+} from "lucide-react";
+import {
+  Controller,
+  FormProvider,
+  useForm,
+  useFormContext,
+} from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -24,7 +39,8 @@ export interface FormField {
   password: string;
   currency: string;
 }
-const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+const strongPasswordRegex =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
 export function AuthForms() {
   const [mode, setMode] = useState<Mode>("register");
@@ -41,14 +57,16 @@ export function AuthForms() {
       .min(6, { message: "Password must be at least 6 characters" })
       .regex(
         strongPasswordRegex,
-        "Password must contain uppercase, lowercase, number and special character",
+        "Password must contain uppercase, lowercase, number and special character"
       ),
     // currency: z.string().min(1, { message: "Currency is required" }),
   });
 
   const loginSchema = z.object({
     email: z.string().email({ message: "Enter a valid Email Address" }),
-    password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
   });
 
   const partSchema = mode == "register" ? registerSchema : loginSchema;
@@ -76,7 +94,10 @@ export function AuthForms() {
       if (mode === "register") {
         await registerUser(user as FormField);
       } else {
-        const { email, password } = user as Pick<FormField, "email" | "password">;
+        const { email, password } = user as Pick<
+          FormField,
+          "email" | "password"
+        >;
         const acc = await loginUser(email, password);
         if (acc?.role == "admin") navigate({ to: "/admin" });
       }
@@ -88,7 +109,8 @@ export function AuthForms() {
         duration: 4000,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed Operation";
+      const message =
+        error instanceof Error ? error.message : "Failed Operation";
       console.log(message);
       toast({
         title: "Error Message",
@@ -110,7 +132,10 @@ export function AuthForms() {
       className="relative"
     >
       <div className="relative overflow-hidden rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl wallet-ring">
-        <div className="absolute inset-x-0 top-0 h-32 wallet-dotgrid opacity-30" aria-hidden />
+        <div
+          className="absolute inset-x-0 top-0 h-32 wallet-dotgrid opacity-30"
+          aria-hidden
+        />
 
         <div className="relative">
           <div className="flex items-center gap-2">
@@ -129,14 +154,18 @@ export function AuthForms() {
                   type="button"
                   onClick={() => setMode(m)}
                   className={`relative w-full flex-1 rounded-full px-3 py-2.5 text-xs font-semibold transition overflow-clip z-20 ${
-                    mode === m ? "" : "text-[var(--w-muted)] hover:text-[var(--w-fg)]"
+                    mode === m
+                      ? ""
+                      : "text-[var(--w-muted)] hover:text-[var(--w-fg)]"
                   }`}
                 >
                   {m === "register" ? "Create wallet" : "Sign in"}
                 </button>
 
                 <motion.div
-                  animate={mode == m ? { y: -2, scale: 1.1 } : { y: 0, scale: 1 }}
+                  animate={
+                    mode == m ? { y: -2, scale: 1.1 } : { y: 0, scale: 1 }
+                  }
                   transition={{ type: "spring", stiffness: 500, damping: 12 }}
                   className={`absolute inset-0 rounded-full ${mode == m && "bg-[var(--w-brand)] text-[var(--w-brand-contrast)]"} `}
                 ></motion.div>
@@ -145,7 +174,10 @@ export function AuthForms() {
           </div>
 
           <FormProvider {...formControl}>
-            <form onSubmit={handleSubmission} className="mt-6 flex flex-col gap-2">
+            <form
+              onSubmit={handleSubmission}
+              className="mt-6 flex flex-col gap-2"
+            >
               {mode === "register" && (
                 <Field
                   fieldName="fullName"
@@ -175,7 +207,11 @@ export function AuthForms() {
                       className="text-[var(--w-muted)] transition hover:text-[var(--w-fg)]"
                       aria-label="Toggle password"
                     >
-                      {showPw ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                      {showPw ? (
+                        <EyeOff className="size-4" />
+                      ) : (
+                        <Eye className="size-4" />
+                      )}
                     </button>
                   }
                 />
@@ -195,7 +231,10 @@ export function AuthForms() {
                 type="submit"
                 disabled={loading}
                 className={`mt-2 inline-flex items-center justify-center gap-2 rounded-full px-5 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg  ${loading ? "pointer-events-none opacity-40" : ""}`}
-                style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
+                style={{
+                  background: "var(--w-brand)",
+                  color: "var(--w-brand-contrast)",
+                }}
               >
                 {loading ? (
                   <>
@@ -260,7 +299,11 @@ function Field({
             placeholder={placeholder}
             className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-2 ${icon ? "pl-11" : "pl-4"} ${suffix ? "pr-11" : "pr-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60 transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
           />
-          {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2">{suffix}</span>}
+          {suffix && (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2">
+              {suffix}
+            </span>
+          )}
         </div>
       </label>
       {typeof errors[fieldName]?.message === "string" && (
@@ -298,7 +341,9 @@ function SelectField({ label, fieldName, placeholder, icon }: SelectFieldProp) {
       <label className="flex flex-col mt-1.5 gap-1.5">
         <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--w-muted)] flex justify-between mt-1.5">
           {label}
-          <span className="text-[var(--w-brand)]">{getCurrencySymbol(watch("currency"))}</span>
+          <span className="text-[var(--w-brand)]">
+            {getCurrencySymbol(watch("currency"))}
+          </span>
         </span>
         <div className="relative">
           {icon && (
@@ -312,7 +357,10 @@ function SelectField({ label, fieldName, placeholder, icon }: SelectFieldProp) {
             name="currency"
             render={({ field }) => (
               <>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
                   <SelectTrigger
                     className={`w-full rounded-xl border border-[var(--w-border)] bg-[var(--w-input)] py-3 ${icon ? "pl-11" : "pl-4"} text-base font-medium text-[var(--w-fg)] placeholder:text-[var(--w-muted)]/60! transition focus:border-[var(--w-brand)] focus:outline-none focus:ring-2 focus:ring-[var(--w-brand-ring)]`}
                   >

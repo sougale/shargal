@@ -1,6 +1,19 @@
 import { ReactHTMLElement, useMemo, useState } from "react";
-import { createFileRoute, Link, notFound, useNavigate, useParams } from "@tanstack/react-router";
-import { Gavel, Heart, ShieldCheck, Mail, MapPin, DollarSign } from "lucide-react";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  useNavigate,
+  useParams,
+} from "@tanstack/react-router";
+import {
+  Gavel,
+  Heart,
+  ShieldCheck,
+  Mail,
+  MapPin,
+  DollarSign,
+} from "lucide-react";
 import { AccountStatusBlocker } from "@/components/site/AccountStatusBlocker";
 import {
   auctionLots,
@@ -25,8 +38,10 @@ import Fields from "@/components/site/Fields";
 import { Bid, Notification, WalletAccount } from "@/types";
 import { db } from "@/services/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 export const Route = createFileRoute("/auctions/$slug")({
   // loader: ({ params }) => {
@@ -70,7 +85,9 @@ function AuctionLotPage() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { setDocument, updateDocument } = useDoc();
-  const sellerOtherLots = getLotsBySeller(lot.sellerSlug).filter((l) => l.slug !== lot.slug);
+  const sellerOtherLots = getLotsBySeller(lot.sellerSlug).filter(
+    (l) => l.slug !== lot.slug
+  );
 
   const amountSchema = z.object({
     bidAmount: z.number().min(1, {
@@ -194,7 +211,8 @@ function AuctionLotPage() {
         setTimeout(() => {
           toast({
             title: "Info",
-            description: "Bid Lower Than The Minimum Bidding Amount, Please Top Up Your Bid Amount",
+            description:
+              "Bid Lower Than The Minimum Bidding Amount, Please Top Up Your Bid Amount",
             variant: "info",
             duration: 10000,
             position: "top",
@@ -221,13 +239,20 @@ function AuctionLotPage() {
       const getPreviousBid = await getDoc(previousBid);
 
       if (getPreviousBid.exists()) {
-        const previousUserBid = doc(db, "users", (getPreviousBid.data() as Bid).userID);
+        const previousUserBid = doc(
+          db,
+          "users",
+          (getPreviousBid.data() as Bid).userID
+        );
         const getPreviousBidUser = await getDoc(previousUserBid);
         if (getPreviousBid.exists() && getPreviousBidUser.exists()) {
           const bidData = getPreviousBid.data() as Bid;
           const userData = getPreviousBidUser.data() as WalletAccount;
           const newBal = await (userData.wallet.balance + bidData.bidAmount);
-          const newBidBal = await Math.max(0, userData.wallet.bidBalance - bidData.bidAmount);
+          const newBidBal = await Math.max(
+            0,
+            userData.wallet.bidBalance - bidData.bidAmount
+          );
 
           await updateDocument({
             collections: "users",
@@ -284,9 +309,10 @@ function AuctionLotPage() {
       });
 
       // Email notifications
+      // User gets user template to their email
+      // Admin gets admin template to support@sharjahbiennial.online
       try {
-        // Notify the bidder
-        await sendGalleryEmail("bid_placed", {
+        await sendUserNotification("bid_placed", {
           to_email: currentUser.email,
           to_name: currentUser.fullName,
           lotTitle: lot.title,
@@ -297,10 +323,7 @@ function AuctionLotPage() {
           fullName: currentUser.fullName,
         });
 
-        // Notify admin
-        await sendGalleryEmail("admin_new_bid", {
-          to_email: SITE_INFO.contact.email,
-          to_name: "Admin",
+        await sendAdminNotification("bid_placed", {
           lotTitle: lot.title,
           slug: lot.slug,
           bidAmount: formBidAmount,
@@ -342,9 +365,9 @@ function AuctionLotPage() {
             },
           }).catch(() => {});
 
-          // Email the previous bidder
+          // Email the previous bidder (user template to their email)
           try {
-            await sendGalleryEmail("outbid_notification", {
+            await sendUserNotification("outbid_notification", {
               to_email: prevBid.email,
               to_name: prevBid.fullName,
               lotTitle: lot.title,
@@ -393,7 +416,11 @@ function AuctionLotPage() {
     lot.status !== "active" || new Date(lot.endsAt).getTime() <= Date.now();
 
   const canPlaceBid =
-    !!liveUser && isAccountActive && !isSeller && !isCurrentLeader && !isLotClosedForBidding;
+    !!liveUser &&
+    isAccountActive &&
+    !isSeller &&
+    !isCurrentLeader &&
+    !isLotClosedForBidding;
 
   return (
     <article>
@@ -448,7 +475,9 @@ function AuctionLotPage() {
                   onClick={() => setActiveIdx(i)}
                   className={cn(
                     "group relative aspect-square overflow-hidden bg-surface outline outline-1 -outline-offset-1 transition-all",
-                    isActive ? "outline-ink" : "outline-ink/10 hover:outline-ink/40",
+                    isActive
+                      ? "outline-ink"
+                      : "outline-ink/10 hover:outline-ink/40"
                   )}
                   aria-label={img.label}
                   title={img.label}
@@ -458,7 +487,9 @@ function AuctionLotPage() {
                     alt={img.label}
                     className={cn(
                       "absolute inset-0 h-full w-full object-cover transition-opacity",
-                      isActive ? "opacity-100" : "opacity-80 group-hover:opacity-100",
+                      isActive
+                        ? "opacity-100"
+                        : "opacity-80 group-hover:opacity-100"
                     )}
                   />
                   {isOtherLot && (
@@ -512,19 +543,24 @@ function AuctionLotPage() {
             )}
           </div>
 
-          <p className="text-base leading-relaxed text-ink/80">{lot.description}</p>
+          <p className="text-base leading-relaxed text-ink/80">
+            {lot.description}
+          </p>
 
           {/* Live bid panel */}
           <div className="border border-ink/15 bg-surface/50 p-6">
             <div className="flex items-baseline justify-between">
               <div>
-                <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Current bid</p>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                  Current bid
+                </p>
                 <p className="mt-1 font-display text-4xl italic text-ink">
                   {formatBid(lot.currentBid)}
                 </p>
                 <p className="mt-1 text-xs text-detail">
                   {lot.bidCount} Bid(s) · Estimate {formatBid(lot.estimateLow)}–
-                  {formatBid(lot.estimateHigh)} · Start Bid At {formatBid(lot.startBid)}
+                  {formatBid(lot.estimateHigh)} · Start Bid At{" "}
+                  {formatBid(lot.startBid)}
                 </p>
               </div>
               <span
@@ -532,13 +568,13 @@ function AuctionLotPage() {
                   "inline-flex items-center gap-1.5 border px-2.5 py-1 text-[10px] uppercase tracking-[0.22em]",
                   lot.reserveMet
                     ? "border-clay/40 bg-clay/10 text-clay"
-                    : "border-ink/20 text-detail",
+                    : "border-ink/20 text-detail"
                 )}
               >
                 <span
                   className={cn(
                     "size-1.5 rounded-full",
-                    lot.reserveMet ? "bg-clay" : "bg-detail/50",
+                    lot.reserveMet ? "bg-clay" : "bg-detail/50"
                   )}
                 />
                 {lot.reserveMet ? "Reserve met" : "No reserve yet"}
@@ -546,7 +582,9 @@ function AuctionLotPage() {
             </div>
 
             <div className="mt-6 border-t border-ink/10 pt-6">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Closes in</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Closes in
+              </p>
               <div className="mt-3">
                 <Countdown endsAt={lot.endsAt} size="md" />
               </div>
@@ -585,12 +623,14 @@ function AuctionLotPage() {
                     <button
                       type="button"
                       onClick={() => toggleFavorite(lot.slug)}
-                      aria-label={fav ? "Remove from favourites" : "Add to favourites"}
+                      aria-label={
+                        fav ? "Remove from favourites" : "Add to favourites"
+                      }
                       className={cn(
                         "inline-flex size-12 items-center justify-center border transition-colors",
                         fav
                           ? "border-clay bg-clay/10 text-clay"
-                          : "border-ink/20 text-ink hover:border-ink",
+                          : "border-ink/20 text-ink hover:border-ink"
                       )}
                     >
                       <Heart
@@ -625,7 +665,9 @@ function AuctionLotPage() {
                       <div className="inline-flex items-center rounded bg-ink/5 px-2 py-0.5 text-[10px] uppercase tracking-[0.2em] text-detail">
                         Seller
                       </div>
-                      <p className="text-sm text-ink/80">You cannot bid on your own auction lot.</p>
+                      <p className="text-sm text-ink/80">
+                        You cannot bid on your own auction lot.
+                      </p>
                     </div>
                   </div>
                 ) : isCurrentLeader ? (
@@ -635,8 +677,8 @@ function AuctionLotPage() {
                         Leading
                       </div>
                       <p className="text-sm text-ink/80">
-                        You are currently the highest bidder. You cannot place another bid until you
-                        are outbid.
+                        You are currently the highest bidder. You cannot place
+                        another bid until you are outbid.
                       </p>
                     </div>
                   </div>
@@ -659,23 +701,33 @@ function AuctionLotPage() {
           {/* Specifications */}
           <dl className="grid grid-cols-2 gap-px border-y border-ink/10 bg-ink/10">
             <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Medium</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Medium
+              </dt>
               <dd className="mt-2 text-sm">{lot.medium}</dd>
             </div>
             <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Dimensions</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Dimensions
+              </dt>
               <dd className="mt-2 text-sm">{lot.dimensions}</dd>
             </div>
             <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Year</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Year
+              </dt>
               <dd className="mt-2 text-sm">{lot.year}</dd>
             </div>
             <div className="bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Condition</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Condition
+              </dt>
               <dd className="mt-2 text-sm">{lot.condition}</dd>
             </div>
             <div className="col-span-2 bg-canvas p-5">
-              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">Provenance</dt>
+              <dt className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Provenance
+              </dt>
               <dd className="mt-2 text-sm">{lot.provenance}</dd>
             </div>
           </dl>
@@ -683,7 +735,9 @@ function AuctionLotPage() {
           {/* Seller card */}
           {seller && (
             <div className="border border-ink/10 p-6">
-              <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Consigned by</p>
+              <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                Consigned by
+              </p>
               <div className="mt-4 flex items-start gap-4">
                 <SmartImage
                   src={seller.portrait}
@@ -701,7 +755,9 @@ function AuctionLotPage() {
                   </p>
                 </div>
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-ink/75">{seller.short}</p>
+              <p className="mt-4 text-sm leading-relaxed text-ink/75">
+                {seller.short}
+              </p>
               <div className="mt-5 flex flex-wrap items-center gap-4">
                 <Link
                   to="/artists/$slug"

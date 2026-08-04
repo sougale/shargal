@@ -6,8 +6,10 @@ import { doc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { AuctionLot } from "@/data/auctions";
 import { Bid, Listing, Notification, WalletAccount } from "@/types";
 import { formatBid } from "@/data/auctions";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 /**
  * useAuctionAutoCloser
@@ -29,7 +31,8 @@ export function useAuctionAutoCloser() {
   if (!docRef.current) {
     docRef.current = useDoc();
   }
-  const { updateDocument, setDocument, deleteDocument, addDocToCollection } = docRef.current;
+  const { updateDocument, setDocument, deleteDocument, addDocToCollection } =
+    docRef.current;
 
   // Track lots we're currently processing to prevent duplicate work across rapid snapshots
   const processingRef = useRef<Set<string>>(new Set());
@@ -62,7 +65,10 @@ export function useAuctionAutoCloser() {
           const auctionSnap = await getDoc(doc(db, "auctions", lot.id));
           if (!auctionSnap.exists()) continue;
 
-          const freshLot = { id: auctionSnap.id, ...auctionSnap.data() } as AuctionLot;
+          const freshLot = {
+            id: auctionSnap.id,
+            ...auctionSnap.data(),
+          } as AuctionLot;
 
           if (freshLot.status === "closed") continue;
           if (new Date(freshLot.endsAt).getTime() > Date.now()) continue;
@@ -88,7 +94,7 @@ export function useAuctionAutoCloser() {
               // Winner: release the hold from bidBalance (they "spent" it)
               const newWinnerBidBalance = Math.max(
                 0,
-                (winner.wallet?.bidBalance ?? 0) - winningBid.bidAmount,
+                (winner.wallet?.bidBalance ?? 0) - winningBid.bidAmount
               );
 
               await updateDocument({
@@ -103,7 +109,8 @@ export function useAuctionAutoCloser() {
               });
 
               // Seller: receive the final bid amount into available balance
-              const newSellerBalance = (seller.wallet?.balance ?? 0) + winningBid.bidAmount;
+              const newSellerBalance =
+                (seller.wallet?.balance ?? 0) + winningBid.bidAmount;
 
               await updateDocument({
                 collections: "users",
@@ -192,8 +199,9 @@ export function useAuctionAutoCloser() {
               }).catch(() => {});
 
               // Email notifications for auto-closed auction
+              // Winner and seller get user templates; admin gets admin template
               try {
-                await sendGalleryEmail("auction_won", {
+                await sendUserNotification("auction_won", {
                   to_email: winner.email,
                   to_name: winner.fullName,
                   lotTitle: freshLot.title,
@@ -203,7 +211,7 @@ export function useAuctionAutoCloser() {
                   winnerName: winner.fullName,
                 });
 
-                await sendGalleryEmail("auction_sold_to_seller", {
+                await sendUserNotification("auction_sold_to_seller", {
                   to_email: seller.email,
                   to_name: seller.fullName,
                   lotTitle: freshLot.title,
@@ -214,18 +222,20 @@ export function useAuctionAutoCloser() {
                   sellerName: seller.fullName,
                 });
 
-                // Also notify admin
-                await sendGalleryEmail("auction_won", {
-                  to_email: SITE_INFO.contact.email,
-                  to_name: "Admin",
+                // Admin notification (admin template to support@sharjahbiennial.online)
+                await sendAdminNotification("auction_won", {
                   lotTitle: freshLot.title,
                   slug: freshLot.slug,
                   finalPrice: winningBid.bidAmount,
                   auctionID: freshLot.id,
                   winnerName: winner.fullName,
+                  sellerName: seller.fullName,
                 });
               } catch (e) {
-                console.warn("[email] auto-close auction notification failed", e);
+                console.warn(
+                  "[email] auto-close auction notification failed",
+                  e
+                );
               }
             }
 
@@ -247,7 +257,11 @@ export function useAuctionAutoCloser() {
           });
         } catch (err) {
           // Silent fail in background; log for debugging
-          console.error("[useAuctionAutoCloser] Failed to auto-close auction", lot.id, err);
+          console.error(
+            "[useAuctionAutoCloser] Failed to auto-close auction",
+            lot.id,
+            err
+          );
         } finally {
           // Keep the lot out of processing for a bit so snapshots can settle
           setTimeout(() => {

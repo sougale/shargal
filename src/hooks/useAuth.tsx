@@ -6,15 +6,23 @@ import {
   signOut,
   User,
 } from "firebase/auth";
-import { doc, getDoc, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  Timestamp,
+} from "firebase/firestore";
 
 import { WalletAccount } from "@/types";
 import { getCurrencySymbol } from "@/utils";
 import { useCallback, useState } from "react";
 import { useAuthStore } from "@/store/zustand";
 import { useShallow } from "zustand/shallow";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 interface AuthField {
   fullName: string;
@@ -30,7 +38,7 @@ export default function useAuth() {
   const { setUser } = useAuthStore(
     useShallow((state) => ({
       setUser: state.setUser,
-    })),
+    }))
   );
 
   const registerUser = async (user: AuthField) => {
@@ -67,9 +75,10 @@ export default function useAuth() {
 
       await setDoc(currentUser, acc);
 
-      // Notify user + admin of new registration (pending approval)
+      // Notify user (their email) + admin (support@sharjahbiennial.online)
+      // Admin always gets the distinct admin template
       try {
-        await sendGalleryEmail("user_registered", {
+        await sendUserNotification("user_registered", {
           to_email: acc.email,
           to_name: acc.fullName,
           fullName: acc.fullName,
@@ -77,9 +86,7 @@ export default function useAuth() {
           status: "pending",
         });
 
-        await sendGalleryEmail("user_registered", {
-          to_email: SITE_INFO.contact.email,
-          to_name: "Admin",
+        await sendAdminNotification("user_registered", {
           fullName: acc.fullName,
           email: acc.email,
           status: "pending",
@@ -92,7 +99,8 @@ export default function useAuth() {
         ...acc,
       };
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Register failed";
+      const message =
+        error instanceof Error ? error.message : "Register failed";
       throw new Error(message);
     }
   };
@@ -100,11 +108,18 @@ export default function useAuth() {
   const loginUser = useCallback(
     async (email: string, password: string) => {
       try {
-        const userLogin = await signInWithEmailAndPassword(auth, email, password);
+        const userLogin = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
         const userRef = doc(db, "users", userLogin.user.uid);
         const currentUserDoc = await getDoc(userRef);
         if (currentUserDoc.exists()) {
-          const props = { id: currentUserDoc.id, ...currentUserDoc.data() } as WalletAccount;
+          const props = {
+            id: currentUserDoc.id,
+            ...currentUserDoc.data(),
+          } as WalletAccount;
           // Canonical setter: updates user + loggedIn + clears loading + sets hydrated
           setUser(props);
           return props;
@@ -116,7 +131,7 @@ export default function useAuth() {
         throw new Error(message);
       }
     },
-    [setUser],
+    [setUser]
   );
 
   const logOut = useCallback(async () => {
@@ -125,7 +140,8 @@ export default function useAuth() {
       // This will also be caught by the root listener, but we clear immediately for snappy UX
       setUser(null);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Sign out failed";
+      const message =
+        error instanceof Error ? error.message : "Sign out failed";
       throw new Error(message);
     }
   }, [setUser]);

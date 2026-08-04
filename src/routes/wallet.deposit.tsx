@@ -38,8 +38,10 @@ import qrcode from "@/assets/swminto.jpg";
 import { copyClipboard, formatMoney, photoFN } from "@/utils";
 import useDoc from "@/hooks/useDoc";
 import { toast } from "@/lib/useToast";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 export const Route = createFileRoute("/wallet/deposit")({
   component: DepositPage,
@@ -69,7 +71,7 @@ const depositSchema = z.object({
     .refine((file) => file.size <= 5000000, `Max size 5MB.`)
     .refine(
       (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-      "Supported: .jpg, .png, .webp",
+      "Supported: .jpg, .png, .webp"
     ),
 });
 
@@ -79,13 +81,15 @@ function DepositPage() {
       user: s.user,
       isAuthHydrated: s.isAuthHydrated,
       loading: s.loading,
-    })),
+    }))
   );
 
   // Guard: wait for the centralized listener (in __root) to finish onAuth + Firestore fetch.
   // This is the single source of truth. Without this, user can be null or have incomplete shape.
   if (loading || !isAuthHydrated || !user) {
-    return <WalletLoader partial message="Preparing deposit" showSkeleton={false} />;
+    return (
+      <WalletLoader partial message="Preparing deposit" showSkeleton={false} />
+    );
   }
 
   // After the guard, `u` is the fully-loaded WalletAccount fetched by the single listener.
@@ -98,7 +102,7 @@ function DepositPage() {
   const { adminWallets } = useDataStore(
     useShallow((state) => ({
       adminWallets: state.wallets,
-    })),
+    }))
   );
 
   const modWallets = adminWallets.map((w) => ({
@@ -129,7 +133,8 @@ function DepositPage() {
       if (!currentUser || currentUser.status !== "active") {
         toast.error({
           title: "Account not active",
-          description: "Your account must be approved before you can make deposits.",
+          description:
+            "Your account must be approved before you can make deposits.",
         });
         return;
       }
@@ -176,9 +181,9 @@ function DepositPage() {
           },
         });
 
-        // Notify user and admin
+        // Notify user (user template) + admin (admin template to support@sharjahbiennial.online)
         try {
-          await sendGalleryEmail("wallet_deposit", {
+          await sendUserNotification("wallet_deposit", {
             to_email: currentUser.email,
             to_name: currentUser.fullName,
             amount,
@@ -187,9 +192,7 @@ function DepositPage() {
             balance: balanceAfter,
           });
 
-          await sendGalleryEmail("wallet_deposit", {
-            to_email: SITE_INFO.contact.email,
-            to_name: "Admin",
+          await sendAdminNotification("wallet_deposit", {
             amount,
             currency: currentUser.currency,
             fullName: currentUser.fullName,
@@ -207,7 +210,8 @@ function DepositPage() {
         });
         setDone(amount);
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : "Unknown error";
+        const message =
+          error instanceof Error ? error.message : "Unknown error";
         toast.error({
           title: "Error Message",
           description: message,
@@ -221,11 +225,17 @@ function DepositPage() {
         description: invalidate.form?.message,
         position: "top-left",
       });
-    },
+    }
   );
 
   if (done !== null)
-    return <Success amount={done} currency={user.currency} balance={user.wallet.balance} />;
+    return (
+      <Success
+        amount={done}
+        currency={user.currency}
+        balance={user.wallet.balance}
+      />
+    );
 
   return (
     <FormPage
@@ -271,7 +281,10 @@ function DepositPage() {
                   }`}
                   style={
                     amount === p
-                      ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" }
+                      ? {
+                          background: "var(--w-brand)",
+                          color: "var(--w-brand-contrast)",
+                        }
                       : undefined
                   }
                 >
@@ -288,8 +301,13 @@ function DepositPage() {
             className="rounded-[1.5rem] border border-[var(--w-border)] bg-[var(--w-bg-2)] p-5"
           >
             <div className="flex items-center gap-3">
-              <Building2 className="size-5 text-[var(--w-brand)]" strokeWidth={2} />
-              <p className="text-sm font-extrabold text-[var(--w-fg)]">Crypto details</p>
+              <Building2
+                className="size-5 text-[var(--w-brand)]"
+                strokeWidth={2}
+              />
+              <p className="text-sm font-extrabold text-[var(--w-fg)]">
+                Crypto details
+              </p>
             </div>
             <div className="mt-4 grid gap-3">
               <WSelect
@@ -316,7 +334,10 @@ function DepositPage() {
                       }}
                     />
 
-                    <WCopied label={"Click To Copy Wallet Address"} value={wallet.address} />
+                    <WCopied
+                      label={"Click To Copy Wallet Address"}
+                      value={wallet.address}
+                    />
                     <WFile
                       label="Upload Proof"
                       name="proof"
@@ -340,7 +361,9 @@ function DepositPage() {
           </label> */}
 
           <WSubmit>
-            <span className="inline-flex items-center justify-center gap-2">Proceed</span>
+            <span className="inline-flex items-center justify-center gap-2">
+              Proceed
+            </span>
           </WSubmit>
         </form>
       </FormProvider>
@@ -374,11 +397,18 @@ function Sidebar({
       </h3>
 
       <dl className="mt-5 flex flex-col gap-3 text-sm">
-        <Row label="Method" value={METHODS.find((m) => m.value === method)?.label ?? method} />
+        <Row
+          label="Method"
+          value={METHODS.find((m) => m.value === method)?.label ?? method}
+        />
         <Row label="Processing fee" value={` ${symbol} ${fee}`} />
         <Row label="Arrival" value="Instant" />
         <div className="border-t border-[var(--w-border)] pt-3">
-          <Row label="You receive" value={formatMoney(total, user.currency)} bold />
+          <Row
+            label="You receive"
+            value={formatMoney(total, user.currency)}
+            bold
+          />
         </div>
       </dl>
 
@@ -392,7 +422,15 @@ function Sidebar({
   );
 }
 
-function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
+function Row({
+  label,
+  value,
+  bold,
+}: {
+  label: string;
+  value: string;
+  bold?: boolean;
+}) {
   return (
     <div className="flex items-center justify-between gap-3">
       <dt className="text-[var(--w-muted)]">{label}</dt>
@@ -442,7 +480,10 @@ function Success({
         <Link
           to="/wallet"
           className="mt-6 inline-block w-full rounded-[1.4rem] px-6 py-3.5 text-sm font-extrabold uppercase tracking-[0.16em] shadow-lg"
-          style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
+          style={{
+            background: "var(--w-brand)",
+            color: "var(--w-brand-contrast)",
+          }}
         >
           Back to wallet
         </Link>

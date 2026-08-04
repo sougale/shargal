@@ -22,8 +22,17 @@ import {
   PlayCircle,
   Tag,
 } from "lucide-react";
-import { DataTable, SectionHeader, StatusChip, TabBar } from "@/components/admin/primitives";
-import { RecordSheet, type FieldDef, type OperationDef } from "@/components/admin/RecordSheet";
+import {
+  DataTable,
+  SectionHeader,
+  StatusChip,
+  TabBar,
+} from "@/components/admin/primitives";
+import {
+  RecordSheet,
+  type FieldDef,
+  type OperationDef,
+} from "@/components/admin/RecordSheet";
 import { artworks as seedArtworks, type Artwork } from "@/data/artworks";
 import { artists as seedArtists, type Artist } from "@/data/artists";
 import {
@@ -45,8 +54,10 @@ import useDoc from "@/hooks/useDoc";
 import { doc, getDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { db } from "@/services/firebase";
 import { AdminLoader } from "@/components/admin/AdminLoader";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 export const Route = createFileRoute("/admin/exhibition")({
   component: ExhibitionAdmin,
@@ -62,7 +73,7 @@ function ExhibitionAdmin() {
     useShallow((s) => ({
       auctions: s.auctions,
       bids: s.bids,
-    })),
+    }))
   );
 
   // Action loader state (envelops screen for any admin useDoc call)
@@ -70,7 +81,7 @@ function ExhibitionAdmin() {
   const [actionMessage, setActionMessage] = useState("Processing...");
 
   // Page readiness loader for initial dashboard hydration
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
 
   useEffect(() => {
     if ((auctions && auctions.length > 0) || (bids && bids.length > 0)) {
@@ -102,7 +113,12 @@ function ExhibitionAdmin() {
         subMessage="Preparing auction & bid data"
       />
 
-      <AdminLoader fullscreen variant="action" isLoading={actionLoading} message={actionMessage} />
+      <AdminLoader
+        fullscreen
+        variant="action"
+        isLoading={actionLoading}
+        message={actionMessage}
+      />
 
       <SectionHeader
         title="Exhibition"
@@ -112,8 +128,18 @@ function ExhibitionAdmin() {
       <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-5">
         {/* <Kpi icon={Palette} label="Artworks" value={artworks.length.toString()} />
         <Kpi icon={UsersIcon} label="Artists" value={artists.length.toString()} /> */}
-        <Kpi icon={Gavel} label="Live lots" value={auctions.length.toString()} accent />
-        <Kpi icon={Hammer} label="Live bids" value={bids.length.toString()} accent />
+        <Kpi
+          icon={Gavel}
+          label="Live lots"
+          value={auctions.length.toString()}
+          accent
+        />
+        <Kpi
+          icon={Hammer}
+          label="Live bids"
+          value={bids.length.toString()}
+          accent
+        />
         {/* <Kpi icon={Layers} label="Categories" value={categories.length.toString()} />
         <Kpi icon={TrendingUp} label="Avg. price" value={fmtMoney(avgPrice)} /> */}
       </div>
@@ -145,10 +171,20 @@ function ExhibitionAdmin() {
         <ArtistsPanel q={q} rows={artists} setRows={setArtists} artworks={artworks} />
       )} */}
       {tab === "auctions" && (
-        <AuctionsPanel q={q} rows={auctions} startAction={startAction} stopAction={stopAction} />
+        <AuctionsPanel
+          q={q}
+          rows={auctions}
+          startAction={startAction}
+          stopAction={stopAction}
+        />
       )}
       {tab === "bids" && (
-        <BidsPanel q={q} rows={bids} startAction={startAction} stopAction={stopAction} />
+        <BidsPanel
+          q={q}
+          rows={bids}
+          startAction={startAction}
+          stopAction={stopAction}
+        />
       )}
       {/* {tab === "categories" && (
         <CategoriesPanel q={q} rows={categories} setRows={setCategories} artworks={artworks} />
@@ -180,10 +216,10 @@ function ArtworksPanel({
             !q ||
             a.title.toLowerCase().includes(ql) ||
             a.artist.toLowerCase().includes(ql) ||
-            a.categoryLabel.toLowerCase().includes(ql),
+            a.categoryLabel.toLowerCase().includes(ql)
         )
         .map((a) => ({ ...a, id: a.slug })),
-    [rows, q, ql],
+    [rows, q, ql]
   );
 
   function patch(slug: string, p: Partial<Artwork>) {
@@ -196,7 +232,11 @@ function ArtworksPanel({
     const src = rows.find((a) => a.slug === slug);
     if (!src) return;
     setRows([
-      { ...src, slug: `${src.slug}-copy-${Date.now()}`, title: `${src.title} (copy)` },
+      {
+        ...src,
+        slug: `${src.slug}-copy-${Date.now()}`,
+        title: `${src.title} (copy)`,
+      },
       ...rows,
     ]);
   }
@@ -233,10 +273,18 @@ function ArtworksPanel({
             header: "Artwork",
             render: (r) => (
               <div className="flex items-center gap-3">
-                <img src={r.image} alt={r.title} className="size-10 rounded object-cover" />
+                <img
+                  src={r.image}
+                  alt={r.title}
+                  className="size-10 rounded object-cover"
+                />
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold text-[var(--a-fg)]">{r.title}</p>
-                  <p className="truncate text-[10px] text-[var(--a-muted)]">{r.artist}</p>
+                  <p className="truncate text-xs font-semibold text-[var(--a-fg)]">
+                    {r.title}
+                  </p>
+                  <p className="truncate text-[10px] text-[var(--a-muted)]">
+                    {r.artist}
+                  </p>
                 </div>
               </div>
             ),
@@ -253,7 +301,11 @@ function ArtworksPanel({
           {
             key: "year",
             header: "Year",
-            render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.year}</span>,
+            render: (r) => (
+              <span className="a-mono text-xs text-[var(--a-muted)]">
+                {r.year}
+              </span>
+            ),
           },
           {
             key: "price",
@@ -267,7 +319,9 @@ function ArtworksPanel({
           {
             key: "status",
             header: "Status",
-            render: (r) => <StatusChip value={r.highlight ? "active" : "review"} />,
+            render: (r) => (
+              <StatusChip value={r.highlight ? "active" : "review"} />
+            ),
           },
           {
             key: "actions",
@@ -293,13 +347,18 @@ function ArtworksPanel({
         onOpenChange={(o) => !o && setSelected(null)}
         eyebrow="Artwork"
         title={selected?.title ?? ""}
-        subtitle={selected ? `${selected.artist} · ${selected.categoryLabel}` : undefined}
+        subtitle={
+          selected
+            ? `${selected.artist} · ${selected.categoryLabel}`
+            : undefined
+        }
         record={selected}
         fields={fields}
         onSave={(p) => {
           if (!selected) return;
           const next: Partial<Artwork> = { ...p };
-          if (typeof p.highlight === "string") next.highlight = p.highlight === "true";
+          if (typeof p.highlight === "string")
+            next.highlight = p.highlight === "true";
           patch(selected.slug, next);
           setSelected({ ...selected, ...next } as ArtRow);
         }}
@@ -322,12 +381,17 @@ function ArtworksPanel({
             ? ([
                 {
                   id: "highlight",
-                  label: selected.highlight ? "Remove highlight" : "Mark as highlight",
+                  label: selected.highlight
+                    ? "Remove highlight"
+                    : "Mark as highlight",
                   icon: Star,
                   tone: "primary",
                   onRun: () => {
                     patch(selected.slug, { highlight: !selected.highlight });
-                    setSelected({ ...selected, highlight: !selected.highlight });
+                    setSelected({
+                      ...selected,
+                      highlight: !selected.highlight,
+                    });
                   },
                 },
                 {
@@ -350,7 +414,8 @@ function ArtworksPanel({
                   label: "List in auction",
                   icon: Hammer,
                   tone: "success",
-                  onRun: () => alert(`Listed "${selected.title}" in next auction (mock).`),
+                  onRun: () =>
+                    alert(`Listed "${selected.title}" in next auction (mock).`),
                 },
                 {
                   id: "delete",
@@ -415,10 +480,18 @@ function ArtistsPanel({
             header: "Artist",
             render: (r) => (
               <div className="flex items-center gap-3">
-                <img src={r.portrait} alt={r.name} className="size-9 rounded-full object-cover" />
+                <img
+                  src={r.portrait}
+                  alt={r.name}
+                  className="size-9 rounded-full object-cover"
+                />
                 <div>
-                  <p className="text-xs font-semibold text-[var(--a-fg)]">{r.name}</p>
-                  <p className="text-[10px] text-[var(--a-muted)]">{r.discipline}</p>
+                  <p className="text-xs font-semibold text-[var(--a-fg)]">
+                    {r.name}
+                  </p>
+                  <p className="text-[10px] text-[var(--a-muted)]">
+                    {r.discipline}
+                  </p>
                 </div>
               </div>
             ),
@@ -426,7 +499,9 @@ function ArtistsPanel({
           {
             key: "loc",
             header: "Based in",
-            render: (r) => <span className="text-xs text-[var(--a-fg-2)]">{r.location}</span>,
+            render: (r) => (
+              <span className="text-xs text-[var(--a-fg-2)]">{r.location}</span>
+            ),
           },
           {
             key: "works",
@@ -437,7 +512,11 @@ function ArtistsPanel({
               </span>
             ),
           },
-          { key: "status", header: "Status", render: () => <StatusChip value="active" /> },
+          {
+            key: "status",
+            header: "Status",
+            render: () => <StatusChip value="active" />,
+          },
         ]}
       />
       <RecordSheet<ArtistRow>
@@ -462,7 +541,8 @@ function ArtistsPanel({
                 className="mx-auto aspect-square w-full rounded-full object-cover"
               />
               <p className="mt-3 text-xs text-[var(--a-muted)]">
-                {artworks.filter((a) => a.artistSlug === selected.slug).length} works in catalog
+                {artworks.filter((a) => a.artistSlug === selected.slug).length}{" "}
+                works in catalog
               </p>
             </div>
           )
@@ -519,7 +599,12 @@ function AuctionsPanel({
 }) {
   const [selected, setSelected] = useState<LotRow | null>(null);
   const data: LotRow[] = rows
-    .filter((l) => !q || l.title.toLowerCase().includes(q.toLowerCase()) || l.lotNumber.includes(q))
+    .filter(
+      (l) =>
+        !q ||
+        l.title.toLowerCase().includes(q.toLowerCase()) ||
+        l.lotNumber.includes(q)
+    )
     .map((l) => ({
       ...l,
     }));
@@ -579,7 +664,7 @@ function AuctionsPanel({
 
   const open = (
     e: MouseEvent<HTMLDivElement>,
-    { id, images }: { id: string; images: string[] },
+    { id, images }: { id: string; images: string[] }
   ) => {
     if (images.length) setImagesHover(images);
     if (id) {
@@ -651,8 +736,12 @@ function AuctionsPanel({
                   />
                 )}
                 <div>
-                  <p className="text-xs font-semibold text-[var(--a-fg)]">{r.title}</p>
-                  <p className="a-mono text-[10px] text-[var(--a-muted)]">{r.sellerSlug}</p>
+                  <p className="text-xs font-semibold text-[var(--a-fg)]">
+                    {r.title}
+                  </p>
+                  <p className="a-mono text-[10px] text-[var(--a-muted)]">
+                    {r.sellerSlug}
+                  </p>
                 </div>
               </div>
             ),
@@ -688,7 +777,9 @@ function AuctionsPanel({
         eyebrow={`${selected?.sellerSlug ?? ""}`}
         title={selected?.title ?? ""}
         subtitle={
-          selected ? `${selected.categoryLabel} · ${fmtMoney(selected.currentBid ?? 0)}` : undefined
+          selected
+            ? `${selected.categoryLabel} · ${fmtMoney(selected.currentBid ?? 0)}`
+            : undefined
         }
         record={selected}
         fields={fields}
@@ -713,7 +804,9 @@ function AuctionsPanel({
                 let sellerEmail = "";
                 let sellerName = selected.sellerSlug;
                 try {
-                  const sellerDoc = await getDoc(doc(db, "users", selected.userID));
+                  const sellerDoc = await getDoc(
+                    doc(db, "users", selected.userID)
+                  );
                   if (sellerDoc.exists()) {
                     const s = sellerDoc.data() as any;
                     sellerEmail = s.email || "";
@@ -723,7 +816,7 @@ function AuctionsPanel({
 
                 if (newStatus === "active") {
                   if (sellerEmail) {
-                    await sendGalleryEmail("listing_approved", {
+                    await sendUserNotification("listing_approved", {
                       to_email: sellerEmail,
                       to_name: sellerName,
                       title: selected.title,
@@ -733,18 +826,18 @@ function AuctionsPanel({
                     });
                   }
 
-                  await sendGalleryEmail("admin_new_listing", {
-                    to_email: SITE_INFO.contact.email,
-                    to_name: "Admin",
+                  // Admin notification (distinct admin template to support@sharjahbiennial.online)
+                  await sendAdminNotification("listing_approved", {
                     title: selected.title,
                     slug: selected.slug,
                     fullName: sellerName,
+                    email: sellerEmail,
                   });
                 }
 
                 if (newStatus === "suspended" || newStatus === "pending") {
                   if (sellerEmail) {
-                    await sendGalleryEmail("listing_rejected", {
+                    await sendUserNotification("listing_rejected", {
                       to_email: sellerEmail,
                       to_name: sellerName,
                       title: selected.title,
@@ -752,6 +845,14 @@ function AuctionsPanel({
                       reason: "Status updated by admin to " + newStatus,
                     });
                   }
+
+                  await sendAdminNotification("listing_rejected", {
+                    title: selected.title,
+                    slug: selected.slug,
+                    fullName: sellerName,
+                    email: sellerEmail,
+                    reason: "Status updated by admin to " + newStatus,
+                  });
                 }
               } catch (e) {
                 console.warn("[email] listing status notification failed", e);
@@ -905,7 +1006,10 @@ function BidsPanel({
   const [selected, setSelected] = useState<BidRow | null>(null);
   const data: BidRow[] = rows
     .filter(
-      (l) => !q || l.lotTitle.toLowerCase().includes(q.toLowerCase()) || l.fullName.includes(q),
+      (l) =>
+        !q ||
+        l.lotTitle.toLowerCase().includes(q.toLowerCase()) ||
+        l.fullName.includes(q)
     )
     .map((l) => ({
       ...l,
@@ -953,7 +1057,9 @@ function BidsPanel({
                 <span className="grid size-7 place-items-center rounded bg-[var(--a-surface-2)] text-[var(--a-accent)]">
                   <Hammer className="size-3" />
                 </span>
-                <span className="text-xs font-semibold text-[var(--a-fg)]">{r.lotTitle}</span>
+                <span className="text-xs font-semibold text-[var(--a-fg)]">
+                  {r.lotTitle}
+                </span>
               </div>
             ),
           },
@@ -966,12 +1072,18 @@ function BidsPanel({
               </span>
             ),
           },
-          { key: "status", header: "Status", render: (r) => <StatusChip value={"Leading"} /> },
+          {
+            key: "status",
+            header: "Status",
+            render: (r) => <StatusChip value={"Leading"} />,
+          },
           {
             key: "at",
             header: "When",
             render: (r) => (
-              <span className="text-xs text-[var(--a-muted)]">{fmtDateTime(r.placedAt)}</span>
+              <span className="text-xs text-[var(--a-muted)]">
+                {fmtDateTime(r.placedAt)}
+              </span>
             ),
           },
         ]}
@@ -1040,7 +1152,9 @@ function BidsPanel({
 
                     startAction("Deleting bid and returning funds...");
                     try {
-                      const bidder = await getDoc(doc(db, "users", selected.userID));
+                      const bidder = await getDoc(
+                        doc(db, "users", selected.userID)
+                      );
 
                       if (bidder.exists()) {
                         const data = bidder.data() as WalletAccount;
@@ -1050,7 +1164,10 @@ function BidsPanel({
                             id: selected.userID,
                             wallet: {
                               balance: data.wallet.balance + selected.bidAmount,
-                              bidBalance: Math.max(0, data.wallet.bidBalance - selected.bidAmount),
+                              bidBalance: Math.max(
+                                0,
+                                data.wallet.bidBalance - selected.bidAmount
+                              ),
                             },
                           },
                         });
@@ -1095,8 +1212,12 @@ function BidsPanel({
 
                     startAction("Closing bid & transferring ownership...");
                     try {
-                      const biddingUser = await getDoc(doc(db, "users", selected.userID));
-                      const originalUser = await getDoc(doc(db, "users", Lot.userID));
+                      const biddingUser = await getDoc(
+                        doc(db, "users", selected.userID)
+                      );
+                      const originalUser = await getDoc(
+                        doc(db, "users", Lot.userID)
+                      );
 
                       if (biddingUser.exists() && originalUser.exists()) {
                         const data = biddingUser.data() as WalletAccount;
@@ -1109,14 +1230,21 @@ function BidsPanel({
                             id: selected.userID,
                             wallet: {
                               balance: data.wallet.balance,
-                              bidBalance: Math.max(0, data.wallet.bidBalance - selected.bidAmount),
+                              bidBalance: Math.max(
+                                0,
+                                data.wallet.bidBalance - selected.bidAmount
+                              ),
                             },
                           },
                         });
 
                         //for original owner...add to the wallet balance
-                        const topBal = data2.wallet.balance + selected.bidAmount;
-                        console.log({ topBal, bidBalance2: data2.wallet.bidBalance });
+                        const topBal =
+                          data2.wallet.balance + selected.bidAmount;
+                        console.log({
+                          topBal,
+                          bidBalance2: data2.wallet.bidBalance,
+                        });
 
                         await updateDocument({
                           collections: "users",
@@ -1149,7 +1277,8 @@ function BidsPanel({
                             condition: Lot?.condition,
                             totalBidCounts: Lot?.bidCount,
                             placedAt: selected.placedAt,
-                            timeStamp: serverTimestamp() as unknown as Timestamp,
+                            timeStamp:
+                              serverTimestamp() as unknown as Timestamp,
                           },
                         });
 
@@ -1171,7 +1300,7 @@ function BidsPanel({
 
                         // Email notifications for win / sale
                         try {
-                          await sendGalleryEmail("auction_won", {
+                          await sendUserNotification("auction_won", {
                             to_email: data.email,
                             to_name: data.fullName,
                             lotTitle: Lot.title,
@@ -1181,7 +1310,7 @@ function BidsPanel({
                             winnerName: data.fullName,
                           });
 
-                          await sendGalleryEmail("auction_sold_to_seller", {
+                          await sendUserNotification("auction_sold_to_seller", {
                             to_email: data2.email,
                             to_name: data2.fullName,
                             lotTitle: Lot.title,
@@ -1191,8 +1320,20 @@ function BidsPanel({
                             winnerName: data.fullName,
                             sellerName: data2.fullName,
                           });
+
+                          await sendAdminNotification("auction_won", {
+                            lotTitle: Lot.title,
+                            slug: Lot.slug,
+                            finalPrice: selected.bidAmount,
+                            auctionID: Lot.id,
+                            winnerName: data.fullName,
+                            sellerName: data2.fullName,
+                          });
                         } catch (e) {
-                          console.warn("[email] auction win/sale notification failed", e);
+                          console.warn(
+                            "[email] auction win/sale notification failed",
+                            e
+                          );
                         }
                       }
                     } catch (error) {
@@ -1281,14 +1422,22 @@ function CategoriesPanel({
           {
             key: "slug",
             header: "Slug",
-            render: (r) => <span className="a-mono text-xs text-[var(--a-muted)]">{r.slug}</span>,
+            render: (r) => (
+              <span className="a-mono text-xs text-[var(--a-muted)]">
+                {r.slug}
+              </span>
+            ),
           },
           {
             key: "count",
             header: "Works",
             render: (r) => (
               <span className="a-mono text-xs text-[var(--a-fg-2)]">
-                {artworks.filter((a) => a.category === (r.slug as Artwork["category"])).length}
+                {
+                  artworks.filter(
+                    (a) => a.category === (r.slug as Artwork["category"])
+                  ).length
+                }
               </span>
             ),
           },
@@ -1348,10 +1497,14 @@ function Kpi({
   accent?: boolean;
 }) {
   return (
-    <div className={`a-card-elev p-3.5 ${accent ? "ring-1 ring-[var(--a-accent)]/40" : ""}`}>
+    <div
+      className={`a-card-elev p-3.5 ${accent ? "ring-1 ring-[var(--a-accent)]/40" : ""}`}
+    >
       <div className="flex items-center justify-between">
         <p className="a-eyebrow">{label}</p>
-        <Icon className={`size-4 ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-muted)]"}`} />
+        <Icon
+          className={`size-4 ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-muted)]"}`}
+        />
       </div>
       <p
         className={`font-display mt-1.5 text-xl font-extrabold tracking-tight ${accent ? "text-[var(--a-accent)]" : "text-[var(--a-fg)]"}`}

@@ -31,7 +31,11 @@ type PanelKey = "categories" | "artists" | "about" | null;
 const ICON_STROKE = 1.25;
 
 const aboutLinks = [
-  { to: "/about", label: "Our story", note: "Founded 2019. Four seasons a year." },
+  {
+    to: "/about",
+    label: "Our story",
+    note: "Founded 2019. Four seasons a year.",
+  },
   { to: "/contact", label: "Contact", note: "Inquiries, partnerships, press." },
   // { to: "/contact", label: "Partnerships", note: "Patrons, sponsors and houses." },
   // { to: "/about", label: "Journal", note: "Long-reads, studio visits, broadsheets." },
@@ -82,9 +86,14 @@ export function MegaNav() {
       {/* Top utility row */}
       <div className="hidden border-b border-ink/10 px-6 py-2 text-[10px] uppercase tracking-[0.22em] text-detail md:block">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <span>Exhibition No. 12 &middot; Spring 2026 &middot; Open online, daily</span>
+          <span>
+            Exhibition No. 12 &middot; Spring 2026 &middot; Open online, daily
+          </span>
           <div className="flex items-center gap-6">
-            <a href="mailto:support@sharjahbiennial.online" className="hover:text-ink">
+            <a
+              href="mailto:support@sharjahbiennial.online"
+              className="hover:text-ink"
+            >
               support@sharjahbiennial.online
             </a>
             <span>Antwerp &middot; Kyoto &middot; Lisbon</span>
@@ -108,7 +117,7 @@ export function MegaNav() {
             closeNow();
           }}
         >
-          sharjahbiennial
+          Sharjahbiennial
         </Link>
 
         <nav className="hidden items-center gap-9 md:flex ">
@@ -156,8 +165,18 @@ export function MegaNav() {
         <div className="flex items-center gap-1 md:gap-2">
           <WalletNavIcon />
           <NotificationBell />
-          <IconLink to="/favourites" label="Favourites" count={favCount} Icon={Heart} />
-          <IconLink to="/cart" label="Cart" count={cartCount} Icon={ShoppingBag} />
+          <IconLink
+            to="/favourites"
+            label="Favourites"
+            count={favCount}
+            Icon={Heart}
+          />
+          <IconLink
+            to="/cart"
+            label="Cart"
+            count={cartCount}
+            Icon={ShoppingBag}
+          />
           <IconLink to="/profile" label="Profile" Icon={User} />
           <Link
             to="/contact"
@@ -262,11 +281,17 @@ export function MegaNav() {
                   <ul className="grid grid-cols-2 gap-x-10 gap-y-5">
                     {aboutLinks.map((l) => (
                       <li key={l.label}>
-                        <Link to={l.to} onClick={closeNow} className="group block">
+                        <Link
+                          to={l.to}
+                          onClick={closeNow}
+                          className="group block"
+                        >
                           <h4 className="font-display text-2xl italic text-ink group-hover:text-clay">
                             {l.label}
                           </h4>
-                          <p className="mt-1 text-xs leading-relaxed text-detail">{l.note}</p>
+                          <p className="mt-1 text-xs leading-relaxed text-detail">
+                            {l.note}
+                          </p>
                         </Link>
                       </li>
                     ))}
@@ -288,10 +313,12 @@ export function MegaNav() {
                 className="aspect-[4/5] w-full object-cover pointer-events-none"
               />
               <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-detail">
-                {openPanel === "categories" && "Horizon Field — Søren Kjeldsen, 2024"}
+                {openPanel === "categories" &&
+                  "Horizon Field — Søren Kjeldsen, 2024"}
                 {openPanel === "artists" &&
                   "When she was 19, Edmonia Lewis met Frederick Douglass, who inspired her to pursue her art"}
-                {openPanel === "about" && "From the spring catalogue — printed in editions of 200"}
+                {openPanel === "about" &&
+                  "From the spring catalogue — printed in editions of 200"}
               </p>
             </div>
           </div>
@@ -388,7 +415,11 @@ export function MegaNav() {
                   label="Connect wallet"
                   onNavigate={() => setMobileOpen(false)}
                 />
-                <MobileNavLink to="/bids" label="My bids" onNavigate={() => setMobileOpen(false)} />
+                <MobileNavLink
+                  to="/bids"
+                  label="My bids"
+                  onNavigate={() => setMobileOpen(false)}
+                />
                 <MobileNavLink
                   to="/listings"
                   label="My listings"
@@ -456,7 +487,9 @@ export function MegaNav() {
 
                 <div className="mt-8 border-t border-ink/10 pt-6 text-[10px] uppercase tracking-[0.22em] text-detail">
                   <p>Exhibition No. 12</p>
-                  <p className="mt-1">Spring 2026 &middot; Open online, daily</p>
+                  <p className="mt-1">
+                    Spring 2026 &middot; Open online, daily
+                  </p>
                   <p className="mt-4 normal-case tracking-normal text-detail/70">
                     &copy; {new Date().getFullYear()} sharjahbiennial
                   </p>
@@ -464,7 +497,7 @@ export function MegaNav() {
               </div>
             </div>
           </div>,
-          document.body,
+          document.body
         )}
     </header>
   );
@@ -535,7 +568,9 @@ function MobileNavGroup({
                   {item.label}
                 </p>
                 {item.note && (
-                  <p className="mt-0.5 text-xs leading-relaxed text-detail">{item.note}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-detail">
+                    {item.note}
+                  </p>
                 )}
               </Link>
             </li>

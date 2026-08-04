@@ -4,18 +4,12 @@ import { Timestamp } from "firebase/firestore";
 
 export const requireAuth = async () => {
   try {
-    const user = await useAuthStore.getState().user; // Assume getUser fetches the user
+    const user = await useAuthStore.getState().user;
     if (user && user.createdAt instanceof Timestamp) {
-      user.createdAt = user.createdAt.toDate().toISOString(); // Convert Timestamp to string
+      user.createdAt = user.createdAt.toDate().toISOString();
     }
     return { user };
   } catch {
     throw redirect({ to: "/connect" });
   }
-};
-
-export const requireAdmin = async () => {
-  const { user } = await requireAuth();
-  if (user?.role?.includes("admin")) return { user };
-  throw redirect({ to: "/wallet" });
 };

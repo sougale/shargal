@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { PageHeader } from "@/components/site/PageHeader";
-import { sendGalleryEmail } from "@/lib/emailjsTemplate";
-import { SITE_INFO } from "@/lib/siteInfo";
+import {
+  sendUserNotification,
+  sendAdminNotification,
+} from "@/lib/emailjsTemplate";
 
 export const Route = createFileRoute("/contact")({
   component: ContactPage,
@@ -43,28 +45,27 @@ function ContactPage() {
 
             const name = (formData.get("name") as string) || "";
             const email = (formData.get("email") as string) || "";
-            const subject = (formData.get("subject") as string) || "Contact Inquiry";
+            const subject =
+              (formData.get("subject") as string) || "Contact Inquiry";
             const message = (formData.get("message") as string) || "";
 
             try {
-              // Notify admin
-              await sendGalleryEmail("contact_form_submission", {
-                to_email: SITE_INFO.contact.email,
-                to_name: "Admin",
+              // Notify admin (always to support@sharjahbiennial.online with admin template)
+              await sendAdminNotification("contact_form_submission", {
                 name,
                 email,
                 subject,
                 message,
               });
 
-              // Auto-reply to sender
-              await sendGalleryEmail("contact_form_submission", {
+              // Auto-reply to the visitor (user template to their email)
+              await sendUserNotification("contact_form_submission", {
                 to_email: email,
                 to_name: name,
                 name,
-                email: SITE_INFO.contact.email,
+                email,
                 subject: `Re: ${subject}`,
-                message: `Thank you for contacting ${SITE_INFO.name}. We have received your message and will respond within two working days.`,
+                message: `Thank you for contacting sharjahbiennial. We have received your message and will respond within two working days.`,
               });
             } catch (err) {
               console.warn("[email] contact form notification failed", err);
@@ -82,7 +83,9 @@ function ContactPage() {
             ] as const
           ).map((f) => (
             <label key={f.id} className="flex flex-col gap-2">
-              <span className="text-[11px] uppercase tracking-[0.22em] text-detail">{f.label}</span>
+              <span className="text-[11px] uppercase tracking-[0.22em] text-detail">
+                {f.label}
+              </span>
               <input
                 id={f.id}
                 name={f.id}
@@ -98,7 +101,9 @@ function ContactPage() {
             </label>
           ))}
           <label className="flex flex-col gap-2">
-            <span className="text-[11px] uppercase tracking-[0.22em] text-detail">Message</span>
+            <span className="text-[11px] uppercase tracking-[0.22em] text-detail">
+              Message
+            </span>
             <textarea
               name="message"
               required
@@ -118,7 +123,9 @@ function ContactPage() {
 
         <aside className="flex flex-col gap-10 text-sm leading-relaxed text-ink/80">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Gallery</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+              Gallery
+            </p>
             <p className="mt-3 font-display text-2xl italic">sharjahbiennial</p>
             <p className="mt-2">
               14 Linen Street
@@ -127,7 +134,9 @@ function ContactPage() {
             </p>
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Hours</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+              Hours
+            </p>
             <p className="mt-3">
               Tuesday &ndash; Saturday
               <br />
@@ -135,7 +144,9 @@ function ContactPage() {
             </p>
           </div>
           <div>
-            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Direct</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+              Direct
+            </p>
             <p className="mt-3">
               <a
                 href="mailto:support@sharjahbiennial.online"

@@ -6,7 +6,10 @@ import { CategoryChips } from "@/components/site/CategoryChips";
 import { PageHeader } from "@/components/site/PageHeader";
 import { FilterDrawer } from "@/components/site/FilterDrawer";
 import { ActiveFilterChips } from "@/components/site/ActiveFilterChips";
-import { makeDefaultFilters, type Filters } from "@/components/site/filters-types";
+import {
+  makeDefaultFilters,
+  type Filters,
+} from "@/components/site/filters-types";
 import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { useChicagoArtworksByCategory } from "@/queries";
 import { Loader } from "@/components/site/Loader";
@@ -30,9 +33,11 @@ export const Route = createFileRoute("/gallery")({
 function applyFilters(f: Filters, artworks: Artwork[]) {
   return artworks.filter((a) => {
     if (a.price < f.priceMin || a.price > f.priceMax) return false;
-    if (f.category.length && !f.category.some((fc) => fc == a.category)) return false;
+    if (f.category.length && !f.category.some((fc) => fc == a.category))
+      return false;
     if (f.size.length && !f.size.includes(a.sizeCategory)) return false;
-    if (f.orientation.length && !f.orientation.includes(a.orientation)) return false;
+    if (f.orientation.length && !f.orientation.includes(a.orientation))
+      return false;
     if (f.medium.length && !f.medium.includes(a.medium)) return false;
     if (f.theme.length && !f.theme.includes(a.theme)) return false;
     if (f.style.length && !f.style.includes(a.style)) return false;
@@ -46,7 +51,7 @@ function applyFilters(f: Filters, artworks: Artwork[]) {
 
 function GalleryPage() {
   const [filters, setFilters] = useState<Filters>(() =>
-    makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax),
+    makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax)
   );
 
   const user = useAuthStore((s) => s.user);
@@ -60,9 +65,12 @@ function GalleryPage() {
   // Fall back to Chicago if Met is empty
   const modMetArtworks = changeMetArtWorkProps(met.artworks);
 
-  console.log(modMetArtworks);
+  // console.log(modMetArtworks);
 
-  const filtered = useMemo(() => applyFilters(filters, modMetArtworks), [filters, modMetArtworks]);
+  const filtered = useMemo(
+    () => applyFilters(filters, modMetArtworks),
+    [filters, modMetArtworks]
+  );
 
   const isLoading = met.isLoading;
 

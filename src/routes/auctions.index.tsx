@@ -14,7 +14,13 @@ import { artists } from "@/data/artists";
 import { PageHeader } from "@/components/site/PageHeader";
 import { AuctionCard } from "@/components/site/AuctionCard";
 import { Countdown } from "@/components/site/Countdown";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import Slider from "@mui/material/Slider";
 import {
@@ -77,7 +83,9 @@ function apply(lots: AuctionLot[], f: AuctionFilters, sort: SortKey) {
   out = [...out];
   switch (sort) {
     case "ending-soon":
-      out.sort((a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime());
+      out.sort(
+        (a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime()
+      );
       break;
     case "newest":
       out.sort((a, b) => b.year - a.year);
@@ -103,7 +111,8 @@ function AuctionsPage() {
   const auctions = useDataStore((s) => s.auctions);
 
   const filtered = useMemo(() => {
-    const f: AuctionFilters = activeCat === "all" ? filters : { ...filters, category: [activeCat] };
+    const f: AuctionFilters =
+      activeCat === "all" ? filters : { ...filters, category: [activeCat] };
     return apply(auctions, f, sort);
   }, [filters, sort, activeCat, auctions]);
 
@@ -115,8 +124,10 @@ function AuctionsPage() {
 
   const featured = useMemo(
     () =>
-      [...auctions].sort((a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime())[0],
-    [auctions],
+      [...auctions].sort(
+        (a, b) => new Date(a.endsAt).getTime() - new Date(b.endsAt).getTime()
+      )[0],
+    [auctions]
   );
 
   return (
@@ -160,12 +171,15 @@ function AuctionsPage() {
                 <Countdown endsAt={featured.endsAt} size="lg" />
                 <div className="flex items-end justify-between border-t border-ink/10 pt-6">
                   <div>
-                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">Start Bid</p>
+                    <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+                      Start Bid
+                    </p>
                     <p className="mt-1 font-display text-3xl italic">
                       {formatBid(featured.startBid)}
                     </p>
                     <p className="text-xs text-detail">
-                      {featured.bidCount} bids · est. {formatBid(featured.estimateLow)}–
+                      {featured.bidCount} bids · est.{" "}
+                      {formatBid(featured.estimateLow)}–
                       {formatBid(featured.estimateHigh)}
                     </p>
                   </div>
@@ -240,7 +254,9 @@ function AuctionsPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-32">
         {filtered.length === 0 ? (
-          <div className="py-24 text-center text-sm text-detail">No lots match these filters.</div>
+          <div className="py-24 text-center text-sm text-detail">
+            No lots match these filters.
+          </div>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((l, i) => (
@@ -282,9 +298,17 @@ function AuctionFilterSheet({
     });
   };
 
-  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  const Section = ({
+    title,
+    children,
+  }: {
+    title: string;
+    children: React.ReactNode;
+  }) => (
     <section className="border-t border-ink/10 py-6 first:border-t-0 first:pt-0">
-      <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">{title}</h3>
+      <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">
+        {title}
+      </h3>
       {children}
     </section>
   );
@@ -327,7 +351,9 @@ function AuctionFilterSheet({
         className="flex h-full w-full max-w-none flex-col gap-0 overflow-hidden bg-canvas p-0 sm:w-[440px] sm:max-w-[440px]"
       >
         <SheetHeader className="flex flex-row items-center justify-between border-b border-ink/10 px-6 py-5">
-          <SheetTitle className="font-display text-2xl italic">Refine lots</SheetTitle>
+          <SheetTitle className="font-display text-2xl italic">
+            Refine lots
+          </SheetTitle>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -339,7 +365,9 @@ function AuctionFilterSheet({
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto px-6 py-6">
-          <Section title={`Bid · ${formatBid(draft.priceMin)} — ${formatBid(draft.priceMax)}`}>
+          <Section
+            title={`Bid · ${formatBid(draft.priceMin)} — ${formatBid(draft.priceMax)}`}
+          >
             {/* <Slider
               value={[draft.priceMin, draft.priceMax]}
               className="mx-auto w-full max-w-xs"
@@ -371,7 +399,9 @@ function AuctionFilterSheet({
                   <Chip
                     key={c.slug}
                     active={draft.category.includes(c.slug)}
-                    onClick={() => toggleArr("category", c.slug as CategorySlug)}
+                    onClick={() =>
+                      toggleArr("category", c.slug as CategorySlug)
+                    }
                   >
                     {c.label}
                   </Chip>
@@ -399,14 +429,18 @@ function AuctionFilterSheet({
                 <span className="text-sm text-ink">Reserve met only</span>
                 <Switch
                   checked={draft.reserveMet}
-                  onCheckedChange={(v) => setDraft((d) => ({ ...d, reserveMet: !!v }))}
+                  onCheckedChange={(v) =>
+                    setDraft((d) => ({ ...d, reserveMet: !!v }))
+                  }
                 />
               </label>
               <label className="flex items-center justify-between gap-4">
                 <span className="text-sm text-ink">Ending in 24 hours</span>
                 <Switch
                   checked={draft.endingSoon}
-                  onCheckedChange={(v) => setDraft((d) => ({ ...d, endingSoon: !!v }))}
+                  onCheckedChange={(v) =>
+                    setDraft((d) => ({ ...d, endingSoon: !!v }))
+                  }
                 />
               </label>
             </div>

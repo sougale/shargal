@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Gavel, Eye, Calendar, DollarSign, Tag, User, Hash, Clock } from "lucide-react";
+import {
+  Gavel,
+  Eye,
+  Calendar,
+  DollarSign,
+  Tag,
+  User,
+  Hash,
+  Clock,
+} from "lucide-react";
 import { PageHeader } from "@/components/site/PageHeader";
 import { useAuthStore, useDataStore } from "@/store/zustand";
 import { AuctionLot, formatBid } from "@/data/auctions";
@@ -21,25 +30,24 @@ export const Route = createFileRoute("/auctions/mine")({
   head: () => ({
     meta: [
       { title: "My Auctions — sharjahbiennial" },
-      { name: "description", content: "View and manage all auction lots you've consigned." },
+      {
+        name: "description",
+        content: "View and manage all auction lots you've consigned.",
+      },
     ],
   }),
 });
+const selectUserID = (s: any) => s.user?.userID ?? null;
+const selectLoading = (s: any) => s.loading;
+const selectHydrated = (s: any) => s.isAuthHydrated;
 
 function MyAuctionsPage() {
-  const { user, loading, isAuthHydrated } = useAuthStore(
-    useShallow((s) => ({
-      user: s.user,
-      loading: s.loading,
-      isAuthHydrated: s.isAuthHydrated,
-    })),
-  );
+  const userID = useAuthStore(selectUserID, Object.is);
+  const user = useAuthStore((s) => s.user);
+  const loading = useAuthStore(selectLoading, Object.is);
+  const isAuthHydrated = useAuthStore(selectHydrated, Object.is);
 
-  const { auctions } = useDataStore(
-    useShallow((s) => ({
-      auctions: s.auctions,
-    })),
-  );
+  const auctions = useDataStore((s) => s.auctions);
 
   const [selected, setSelected] = useState<AuctionLot | null>(null);
 
@@ -48,7 +56,10 @@ function MyAuctionsPage() {
     if (!user) return false;
     if (a.userID && user.userID) return a.userID === user.userID;
     // fallback match by sellerSlug derived from email username
-    const emailUser = user.email?.split("@")[0]?.toLowerCase().replace(/\./g, "-");
+    const emailUser = user.email
+      ?.split("@")[0]
+      ?.toLowerCase()
+      .replace(/\./g, "-");
     return a.sellerSlug === emailUser || a.sellerSlug === user.userName;
   });
 
@@ -58,7 +69,9 @@ function MyAuctionsPage() {
   if (loading || !isAuthHydrated) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-detail">Loading…</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-detail">
+          Loading…
+        </p>
       </div>
     );
   }
@@ -69,7 +82,9 @@ function MyAuctionsPage() {
     return (
       <div className="mx-auto max-w-3xl px-6 py-24 text-center">
         <Gavel className="mx-auto size-10 text-detail" />
-        <h1 className="mt-4 font-display text-4xl italic">Sign in to view your auctions</h1>
+        <h1 className="mt-4 font-display text-4xl italic">
+          Sign in to view your auctions
+        </h1>
         <p className="mt-2 text-detail">
           You need an account to see lots you've put up for auction.
         </p>
@@ -103,7 +118,9 @@ function MyAuctionsPage() {
         {myAuctions.length === 0 ? (
           <div className="flex flex-col items-center gap-4 border border-dashed border-ink/15 py-24 text-center">
             <Gavel className="size-10 text-detail" strokeWidth={1.2} />
-            <p className="text-detail">You haven't put any lots up for auction yet.</p>
+            <p className="text-detail">
+              You haven't put any lots up for auction yet.
+            </p>
             <Link
               to="/sell"
               className="border border-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
@@ -134,7 +151,7 @@ function MyAuctionsPage() {
                         ? "border-clay/40 bg-clay/10 text-clay"
                         : lot.status === "pending"
                           ? "border-ink/20 bg-canvas text-detail"
-                          : "border-ink/20 bg-canvas text-detail",
+                          : "border-ink/20 bg-canvas text-detail"
                     )}
                   >
                     {lot.status}
@@ -160,18 +177,23 @@ function MyAuctionsPage() {
                       <p className="text-[10px] uppercase tracking-[0.18em] text-detail">
                         Current bid
                       </p>
-                      <p className="font-display text-xl italic">{formatBid(lot.currentBid)}</p>
+                      <p className="font-display text-xl italic">
+                        {formatBid(lot.currentBid)}
+                      </p>
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.18em] text-detail">
                         Estimate
                       </p>
                       <p className="text-sm">
-                        {formatBid(lot.estimateLow)} – {formatBid(lot.estimateHigh)}
+                        {formatBid(lot.estimateLow)} –{" "}
+                        {formatBid(lot.estimateHigh)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.18em] text-detail">Bids</p>
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-detail">
+                        Bids
+                      </p>
                       <p>{lot.bidCount}</p>
                     </div>
                     <div>
@@ -214,7 +236,7 @@ function MyAuctionsPage() {
             "fixed inset-0 w-full h-dvh max-w-none left-0 top-0 translate-x-0 translate-y-0 rounded-none",
             // Desktop: centered, elegant, NOT full screen
             "md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2",
-            "md:w-[calc(100%-2rem)] md:max-w-5xl md:max-h-[88vh] md:h-[88dvh] md:rounded-xl",
+            "md:w-[calc(100%-2rem)] md:max-w-5xl md:max-h-[88vh] md:h-[88dvh] md:rounded-xl"
           )}
         >
           {selected && (
@@ -223,7 +245,8 @@ function MyAuctionsPage() {
               <div className="shrink-0 border-b border-ink/10 bg-canvas px-5 py-4 flex items-start justify-between sticky top-0 z-10">
                 <div className="min-w-0 pr-8">
                   <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
-                    Lot {selected.lotNumber.slice(0, 5) || "—"} · {selected.categoryLabel}
+                    Lot {selected.lotNumber.slice(0, 5) || "—"} ·{" "}
+                    {selected.categoryLabel}
                   </p>
                   <h2 className="font-display text-[22px] md:text-3xl italic leading-tight mt-0.5 break-words">
                     {selected.title}
@@ -251,20 +274,35 @@ function MyAuctionsPage() {
                         <DetailRow label="Slug" value={selected.slug} />
                         <DetailRow label="ID" value={selected.id || "—"} />
                         <DetailRow label="Seller" value={selected.sellerSlug} />
-                        <DetailRow label="User ID" value={selected.userID || "—"} />
+                        <DetailRow
+                          label="User ID"
+                          value={selected.userID || "—"}
+                        />
                         {/* <DetailRow label="Status" value={selected.status} /> */}
                       </DetailSection>
 
                       <DetailSection title="Artwork">
                         <DetailRow label="Year" value={String(selected.year)} />
                         <DetailRow label="Medium" value={selected.medium} />
-                        <DetailRow label="Dimensions" value={selected.dimensions} />
-                        <DetailRow label="Description" value={selected.description} />
+                        <DetailRow
+                          label="Dimensions"
+                          value={selected.dimensions}
+                        />
+                        <DetailRow
+                          label="Description"
+                          value={selected.description}
+                        />
                       </DetailSection>
 
                       <DetailSection title="Provenance & Condition">
-                        <DetailRow label="Provenance" value={selected.provenance} />
-                        <DetailRow label="Condition" value={selected.condition} />
+                        <DetailRow
+                          label="Provenance"
+                          value={selected.provenance}
+                        />
+                        <DetailRow
+                          label="Condition"
+                          value={selected.condition}
+                        />
                       </DetailSection>
                     </div>
 
@@ -276,12 +314,21 @@ function MyAuctionsPage() {
                           label="Estimate"
                           value={`${formatBid(selected.estimateLow)} – ${formatBid(selected.estimateHigh)}`}
                         />
-                        <DetailRow label="Start Bid" value={formatBid(selected.startBid)} />
-                        <DetailRow label="Current Bid" value={formatBid(selected.currentBid)} />
+                        <DetailRow
+                          label="Start Bid"
+                          value={formatBid(selected.startBid)}
+                        />
+                        <DetailRow
+                          label="Current Bid"
+                          value={formatBid(selected.currentBid)}
+                        />
                       </DetailSection>
 
                       <DetailSection title="Bidding">
-                        <DetailRow label="Bids" value={String(selected.bidCount)} />
+                        <DetailRow
+                          label="Bids"
+                          value={String(selected.bidCount)}
+                        />
                         <DetailRow
                           label="Reserve"
                           value={selected.reserveMet ? "Met" : "Not met yet"}
@@ -348,11 +395,19 @@ function MyAuctionsPage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="border border-ink/10 bg-surface/10 p-4">
       <div className="mb-3 flex items-center gap-2 border-b border-ink/10 pb-2">
-        <p className="text-[10px] uppercase tracking-[0.22em] text-detail">{title}</p>
+        <p className="text-[10px] uppercase tracking-[0.22em] text-detail">
+          {title}
+        </p>
       </div>
       <div className="space-y-2 text-sm">{children}</div>
     </div>
@@ -365,7 +420,9 @@ function KV({ label, value }: { label: string; value: React.ReactNode }) {
       <span className="shrink-0 text-[11px] uppercase tracking-[0.18em] text-detail/80 pt-0.5">
         {label}
       </span>
-      <span className="text-right break-words font-normal text-ink/70">{value}</span>
+      <span className="text-right break-words font-normal text-ink/70">
+        {value}
+      </span>
     </div>
   );
 }

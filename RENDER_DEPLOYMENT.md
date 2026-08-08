@@ -40,7 +40,7 @@ This guide walks you through deploying the Starstruck Gallery TanStack Start app
    - **Branch**: `main` (or your default branch)
    - **Runtime**: Node
    - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `node dist/server.js`
+   - **Start Command**: `node render-server.js`
 
 3. **Set Environment Variables**
    - Click "Advanced" to expand options
@@ -61,11 +61,11 @@ This guide walks you through deploying the Starstruck Gallery TanStack Start app
 The application uses Vite and TanStack Start, which requires:
 
 - **Build Command**: `npm install && npm run build` - This installs dependencies and builds the production bundle
-- **Start Command**: `node dist/server.js` - This runs the built TanStack Start server
+- **Start Command**: `node render-server.js` (or `npm run start`) - wraps TanStack Start's `fetch` handler in a Node HTTP server
 
 ### Port Configuration
 
-Render assigns a dynamic port via the `PORT` environment variable. The TanStack Start server will use this port. The `HOST` environment variable is set to `0.0.0.0` to ensure the server binds to all network interfaces.
+Render assigns a dynamic port via the `PORT` environment variable. `render-server.js` binds to `0.0.0.0` and uses that port. Do not start `dist/server/server.js` directly — it only exports a `fetch` handler and the process will exit immediately.
 
 ### Node Version
 

@@ -1506,4 +1506,3 @@ function SecRow({
   );
 }
 
-export default UserDetail;

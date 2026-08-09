@@ -58,11 +58,27 @@ function HomePage() {
     medium: a.medium || "N/A",
   }));
 
+  // Full-screen gallery loader until the first Met payload arrives.
+  // Safe with SSR: both server and client start with empty artworks (no
+  // localStorage during render), so this doesn't reintroduce the opacity blank.
+  if (loadingAws && modMetArtworks.length === 0) {
+    return (
+      <>
+        <div className="min-h-screen bg-canvas" />
+        <Loader
+          variant="soft"
+          className="z-20 flex flex-col gap-3"
+          fullScreen
+          message="Loading Gallery.."
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <HeroCarousel />
 
-      {/* Intro statement — always visible so refresh never looks "blank" */}
       <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-24">
           <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
@@ -84,20 +100,12 @@ function HomePage() {
         </div>
       </section>
 
-      {loadingAws && modMetArtworks.length === 0 ? (
-        <Loader
-          message="Loading works…"
-          className="py-16 md:py-24"
-          variant="soft"
-        />
-      ) : (
-        <ImageCarousel
-          artworks={carouselArtworks}
-          eyebrow="The curator has chosen"
-          title="Highlights of the season"
-          link={{ to: "/gallery", label: "All works" }}
-        />
-      )}
+      <ImageCarousel
+        artworks={carouselArtworks}
+        eyebrow="The curator has chosen"
+        title="Highlights of the season"
+        link={{ to: "/gallery", label: "All works" }}
+      />
 
       <section className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-12 flex items-end justify-between border-b border-ink/10 pb-6">

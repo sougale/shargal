@@ -13,17 +13,65 @@ function shuffle<T>(items: T[]): T[] {
   return next;
 }
 
+type HeroSlide = {
+  id: string;
+  image: string;
+  title: string;
+  name: string;
+  medium: string;
+  width: number;
+  height: number;
+};
+
+function HeroFallback({ busy }: { busy?: boolean }) {
+  return (
+    <section
+      className="relative h-[88vh] min-h-[640px] w-full overflow-hidden bg-ink"
+      aria-busy={busy || undefined}
+    >
+      <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/90 to-ink/70" />
+      <div className="relative z-10 flex h-full flex-col justify-end">
+        <div className="mx-auto w-full max-w-7xl px-6 pb-20 md:pb-28">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-canvas/75">
+            Current exhibition
+          </p>
+          <h1 className="mt-6 max-w-5xl font-display text-5xl italic leading-[0.95] text-canvas md:text-7xl lg:text-8xl">
+            Sharjahbiennial
+          </h1>
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-canvas/85 md:text-lg">
+            {busy
+              ? "Gathering works for this season’s hang…"
+              : "Quiet, considered works from a small circle of contemporary artists."}
+          </p>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            <Link
+              to="/gallery"
+              className="border border-canvas bg-canvas px-7 py-3 text-[11px] uppercase tracking-[0.22em] text-ink hover:bg-clay hover:border-clay hover:text-canvas"
+            >
+              Enter the exhibition
+            </Link>
+            <Link
+              to="/about"
+              className="border border-canvas/60 px-7 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:border-canvas"
+            >
+              About the gallery
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function HeroCarousel() {
   const [emblaRef, embla] = useEmblaCarousel({ loop: true, duration: 36 });
   const [index, setIndex] = useState(0);
   const { artworks, loadingAws } = useArtworkContext();
 
-  // Fresh pick every time the artwork set arrives / changes.
-  const slides = useMemo(() => {
-    const withImages = artworks.filter(
-      (a) => typeof a.image === "string" && a.image.trim() !== "",
-    );
-    return shuffle(withImages)
+  // Deterministic selection for SSR / first paint — never Math.random during render.
+  const baseSlides = useMemo<HeroSlide[]>(() => {
+    return artworks
+      .filter((a) => typeof a.image === "string" && a.image.trim() !== "")
       .slice(0, 4)
       .map((a) => ({
         id: a.slug,
@@ -35,6 +83,19 @@ export function HeroCarousel() {
         height: a.height || 1067,
       }));
   }, [artworks]);
+
+  const [slides, setSlides] = useState<HeroSlide[]>(baseSlides);
+
+  useEffect(() => {
+    if (baseSlides.length === 0) {
+      setSlides([]);
+      return;
+    }
+    // Match server HTML first, then shuffle once on the client.
+    setSlides(baseSlides);
+    const id = requestAnimationFrame(() => setSlides(shuffle(baseSlides)));
+    return () => cancelAnimationFrame(id);
+  }, [baseSlides]);
 
   useEffect(() => {
     if (!embla) return;
@@ -53,13 +114,9 @@ export function HeroCarousel() {
     setIndex(0);
   }, [embla, slides]);
 
-  if (loadingAws && slides.length === 0) {
-    return (
-      <section className="relative h-[88vh] min-h-[640px] w-full overflow-hidden bg-ink" />
-    );
+  if (slides.length === 0) {
+    return <HeroFallback busy={loadingAws} />;
   }
-
-  if (slides.length === 0) return null;
 
   const current = slides[index] ?? slides[0];
 

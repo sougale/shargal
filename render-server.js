@@ -68,7 +68,16 @@ function tryServeStatic(req, res, url) {
 }
 
 async function start() {
-  const { default: serverEntry } = await import("./dist/server/server.js");
+  let serverEntry;
+  try {
+    ({ default: serverEntry } = await import("./dist/server/server.js"));
+  } catch (err) {
+    console.error(
+      "Failed to load dist/server/server.js. Is the build complete?",
+      err,
+    );
+    process.exit(1);
+  }
 
   const httpServer = createServer(async (req, res) => {
     try {

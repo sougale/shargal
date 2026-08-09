@@ -11,7 +11,8 @@ export const getRouter = () => {
         gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
         retry: 2,
         refetchOnWindowFocus: false,
-        refetchOnMount: false,
+        // true: hard refresh must refetch empty queries (landing page)
+        refetchOnMount: true,
         refetchOnReconnect: false,
       },
       mutations: {

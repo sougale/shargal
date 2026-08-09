@@ -1,19 +1,22 @@
 // hooks/useMetArtworks.ts
 // Best-practice TanStack Query implementation for Met Museum API
-// with localStorage persistence (restored original implementation)
+// with localStorage persistence (SSR-safe)
 
 import * as React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { metApi } from "../services/metApi";
 import type { MetArtwork } from "../types/metTypes";
 
-// Original localStorage key used by the user
 const LOCAL_STORAGE_KEY = "sharjahbiennial_met_artworks";
+
+/** Stable default so SSR HTML and client hydration share the same query key. */
+export const DEFAULT_MET_CATEGORY = "portrait";
 
 interface PersistedMetData {
   artworks: MetArtwork[];
   total: number;
   timestamp?: number;
+  category?: string;
 }
 
 function loadFromLocalStorage(): PersistedMetData | null {
@@ -36,13 +39,10 @@ function saveToLocalStorage(data: PersistedMetData) {
   try {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
   } catch {
-    // ignore write errors (quota, private mode, etc.)
+    // ignore write errors
   }
 }
 
-/**
- * High-quality search terms for the Met API.
- */
 export const MET_ARTWORK_SEARCH_TERMS = [
   "portrait",
   "landscape",
@@ -87,12 +87,15 @@ export const MET_ARTWORK_SEARCH_TERMS = [
 export type MetArtworkSearchTerm = (typeof MET_ARTWORK_SEARCH_TERMS)[number];
 
 function getRandomCategory(): string {
-  return MET_ARTWORK_SEARCH_TERMS[Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length)];
+  return MET_ARTWORK_SEARCH_TERMS[
+    Math.floor(Math.random() * MET_ARTWORK_SEARCH_TERMS.length)
+  ];
 }
 
 interface UseMetArtworksReturn {
   artworks: MetArtwork[];
   isLoading: boolean;
+  isFetching: boolean;
   error: string | null;
   total: number;
   search: (query: string) => void;
@@ -101,22 +104,34 @@ interface UseMetArtworksReturn {
 }
 
 /**
- * useMetArtworks — Recommended pattern using TanStack Query
+ * useMetArtworks — TanStack Query Met Museum search + hydrate.
  *
- * Single useQuery that performs the full two-step process:
- * 1. Search for IDs
- * 2. Hydrate full artwork objects
- *
- * This is the cleanest way to use TanStack Query with this API shape.
+ * SSR-safe: stable initial category, no localStorage during first paint
+ * (avoids server/client HTML mismatch that blanked the landing page on refresh).
  */
 export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
-  // Use a stable default for SSR hydration safety.
-  // Randomization happens only on client via fetchRandomCategory or search.
-  const [currentCategory, setCurrentCategory] = React.useState(initialQuery || getRandomCategory());
+  const queryClient = useQueryClient();
+  const [currentCategory, setCurrentCategory] = React.useState(
+    () => initialQuery || DEFAULT_MET_CATEGORY,
+  );
 
-  // Load from localStorage so we can show previously fetched artworks instantly
-  // while a fresh request is being sent for the current (or new) category.
-  const persisted = React.useMemo(() => loadFromLocalStorage(), []);
+  // After mount only: seed the query cache from localStorage.
+  // Never do this during render — server has no localStorage and a mismatch
+  // blanks the landing page after hard refresh.
+  React.useEffect(() => {
+    const persisted = loadFromLocalStorage();
+    if (!persisted?.artworks?.length) return;
+
+    const keyCategory =
+      initialQuery || persisted.category || DEFAULT_MET_CATEGORY;
+    queryClient.setQueryData(["met", "full-search", keyCategory], {
+      artworks: persisted.artworks,
+      total: persisted.total || persisted.artworks.length,
+    });
+    setCurrentCategory((prev) =>
+      prev === keyCategory ? prev : keyCategory,
+    );
+  }, [initialQuery, queryClient]);
 
   const artworksQuery = useQuery({
     queryKey: ["met", "full-search", currentCategory],
@@ -127,17 +142,16 @@ export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
       });
 
       if (!searchRes.objectIDs?.length) {
-        return { artworks: [], total: 0 };
+        return { artworks: [] as MetArtwork[], total: 0 };
       }
 
       const artworks = await metApi.getArtworks(searchRes.objectIDs, 40);
 
-      // Persist the freshly fetched data so the next visit (or next category switch)
-      // can display the old results immediately while the new request is in flight.
       saveToLocalStorage({
         artworks,
         total: searchRes.total || artworks.length,
         timestamp: Date.now(),
+        category: currentCategory,
       });
 
       return {
@@ -145,31 +159,21 @@ export function useMetArtworks(initialQuery?: string): UseMetArtworksReturn {
         total: searchRes.total || artworks.length,
       };
     },
-    // Seed with localStorage data so something is visible on first mount
-    // even before the network request finishes.
-    initialData: persisted ?? undefined,
-    // While a new category/search request is in flight, keep showing the previous data
-    // (either from cache or from what we just loaded from localStorage).
     placeholderData: (previousData) => previousData,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5,
+    // Ensure a hard refresh actually loads data
+    refetchOnMount: true,
   });
-
-  const search = (queryStr: string) => {
-    setCurrentCategory(queryStr);
-  };
-
-  const fetchRandomCategory = () => {
-    const next = getRandomCategory();
-    setCurrentCategory(next);
-  };
 
   return {
     artworks: artworksQuery.data?.artworks ?? [],
-    isLoading: artworksQuery.isLoading,
+    // Only treat as blocking load when we have nothing to show
+    isLoading: artworksQuery.isLoading && !artworksQuery.data?.artworks?.length,
+    isFetching: artworksQuery.isFetching,
     error: artworksQuery.error ? (artworksQuery.error as Error).message : null,
     total: artworksQuery.data?.total ?? 0,
-    search,
-    fetchRandomCategory,
+    search: (queryStr: string) => setCurrentCategory(queryStr),
+    fetchRandomCategory: () => setCurrentCategory(getRandomCategory()),
     currentCategory,
   };
 }

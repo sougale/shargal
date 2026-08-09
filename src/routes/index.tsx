@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { changeMetArtWorkProps } from "@/data/artworks";
 import { categories } from "@/data/categories";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
@@ -8,8 +7,8 @@ import { PartnerReasons } from "@/components/site/PartnerReasons";
 import { Sponsors } from "@/components/site/Sponsors";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
-import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { Loader } from "@/components/site/Loader";
+import { useArtworkContext } from "@/lib/useMetArtworksStore";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -40,14 +39,14 @@ export interface ModChicagoArtwork {
 }
 
 function HomePage() {
-  // === TanStack Query powered fetches (best practice) ===
-  // Met images load in browsers; Art Institute IIIF is Cloudflare-blocked in prod.
-  const { artworks: metArtworks, isLoading } = useMetArtworks();
-  const modMetArtworks = changeMetArtWorkProps(metArtworks).filter(
+  // Single source: ArtWorkProvider — avoids a second useMetArtworks() with a
+  // different random category that fought the hero on hard refresh.
+  const { artworks, loadingAws } = useArtworkContext();
+
+  const modMetArtworks = artworks.filter(
     (a) => typeof a.image === "string" && a.image.trim() !== "",
   );
 
-  // Shape Met works for ImageCarousel (same card contract as former Chicago list).
   const carouselArtworks: ModChicagoArtwork[] = modMetArtworks.map((a, i) => ({
     id: Number(a.slug) || i,
     image: a.image,
@@ -59,25 +58,11 @@ function HomePage() {
     medium: a.medium || "N/A",
   }));
 
-  if (isLoading && modMetArtworks.length === 0) {
-    return (
-      <>
-        <div className="min-h-screen min-w-screen bg-canvas"></div>
-        <Loader
-          variant="soft"
-          className="flex flex-col gap-3 overscroll-contain! z-20"
-          fullScreen
-          message="Loading Gallery.."
-        />
-      </>
-    );
-  }
-
   return (
     <>
       <HeroCarousel />
 
-      {/* Intro statement */}
+      {/* Intro statement — always visible so refresh never looks "blank" */}
       <section className="mx-auto max-w-7xl px-6 py-24 md:py-32">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.6fr] lg:gap-24">
           <p className="text-[11px] uppercase tracking-[0.3em] text-detail">
@@ -99,14 +84,21 @@ function HomePage() {
         </div>
       </section>
 
-      <ImageCarousel
-        artworks={carouselArtworks}
-        eyebrow="The curator has chosen"
-        title="Highlights of the season"
-        link={{ to: "/gallery", label: "All works" }}
-      />
+      {loadingAws && modMetArtworks.length === 0 ? (
+        <Loader
+          message="Loading works…"
+          className="py-16 md:py-24"
+          variant="soft"
+        />
+      ) : (
+        <ImageCarousel
+          artworks={carouselArtworks}
+          eyebrow="The curator has chosen"
+          title="Highlights of the season"
+          link={{ to: "/gallery", label: "All works" }}
+        />
+      )}
 
-      {/* Featured Masonry - powered by TanStack Query (Met Museum) */}
       <section className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-12 flex items-end justify-between border-b border-ink/10 pb-6">
           <div>
@@ -139,13 +131,14 @@ function HomePage() {
         )}
       </section>
 
-      <ImageCarousel
-        artworks={carouselArtworks.slice(8)}
-        eyebrow="Newly arrived"
-        title="From the studios, this season"
-      />
+      {modMetArtworks.length > 8 && (
+        <ImageCarousel
+          artworks={carouselArtworks.slice(8)}
+          eyebrow="Newly arrived"
+          title="From the studios, this season"
+        />
+      )}
 
-      {/* Categories preview */}
       <section className="mx-auto max-w-7xl px-6 py-24">
         <div className="mb-12 flex items-end justify-between border-b border-ink/10 pb-6">
           <h2 className="font-display text-3xl italic md:text-4xl">
@@ -178,14 +171,9 @@ function HomePage() {
         </div>
       </section>
 
-      {/* <ArtistSpotlight artist={spotlight} /> */}
-
       <PartnerReasons />
-
       <Sponsors />
-
       <HistoryTimeline />
-
       <FaqAccordion />
     </>
   );

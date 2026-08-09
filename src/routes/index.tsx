@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-  changeMetArtWorkProps,
   artworks as staticArtworks,
+  changeMetArtWorkProps,
 } from "@/data/artworks";
 import { categories } from "@/data/categories";
 import { getArtist } from "@/data/artists";
@@ -16,7 +16,7 @@ import { useChicagoArtworksByCategory } from "@/queries";
 import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { Loader } from "@/components/site/Loader";
 import { useArtInstitute } from "@/hooks/useChicagoArt";
-import { getChicagoImageUrl, type ChicagoArtwork } from "@/queries/chicago";
+import { type ChicagoArtwork, getChicagoImageUrl } from "@/queries/chicago";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -65,7 +65,7 @@ function HomePage() {
       (a): a is ChicagoArtwork & { image_id: string; medium: string } =>
         typeof a.image_id === "string" &&
         a.image_id.trim() !== "" &&
-        !!a.medium_display
+        !!a.medium_display,
     )
     .map((a) => ({
       id: a.id,
@@ -145,18 +145,20 @@ function HomePage() {
           </Link>
         </div>
 
-        {modMetArtworks.length === 0 ? (
-          <Loader
-            message="Loading Selected Works..."
-            className="py-16 md:py-24"
-          />
-        ) : (
-          <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
-            {modMetArtworks.slice(0, 6).map((a, i) => (
-              <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
-            ))}
-          </div>
-        )}
+        {modMetArtworks.length === 0
+          ? (
+            <Loader
+              message="Loading Selected Works..."
+              className="py-16 md:py-24"
+            />
+          )
+          : (
+            <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
+              {modMetArtworks.slice(0, 6).map((a, i) => (
+                <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
+              ))}
+            </div>
+          )}
       </section>
 
       <ImageCarousel

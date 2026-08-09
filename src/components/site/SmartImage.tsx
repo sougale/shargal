@@ -57,12 +57,16 @@ export function SmartImage({
 
   // If we are (or were) loaded, render sharp with no entrance animation.
   // This is the key fix: once true, we stay in the final visual state forever for this src.
-  const showFinalState = isLoaded || wasPreviouslyLoaded;
+  const showFinalState = isLoaded || wasPreviouslyLoaded || priority;
 
   return (
     <div
       className={cn("relative overflow-hidden bg-surface", className)}
-      style={{ aspectRatio: `${width || 100} / ${height || 100}` }}
+      style={
+        className?.includes("absolute")
+          ? undefined
+          : { aspectRatio: `${width || 100} / ${height || 100}` }
+      }
     >
       <motion.img
         ref={imgRef}
@@ -72,12 +76,20 @@ export function SmartImage({
         fetchPriority={priority ? "high" : "auto"}
         decoding="async"
         onLoad={handleLoad}
-        // Only apply the blurred entrance the very first time this specific image loads.
-        // After that (including on scroll back or remount), start already sharp.
+        // Prefer animate-on-load over whileInView — Embla/overflow:hidden often
+        // keeps slides out of the IntersectionObserver, leaving opacity at 0.
         initial={showFinalState ? false : { opacity: 0, filter: "blur(18px)", scale: 1.02 }}
-        // animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
-        whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        viewport={{ once: false }}
+        animate={
+          showFinalState
+            ? { opacity: 1, filter: "blur(0px)", scale: 1 }
+            : undefined
+        }
+        whileInView={
+          showFinalState
+            ? undefined
+            : { opacity: 1, scale: 1, filter: "blur(0px)" }
+        }
+        viewport={{ once: true, amount: 0.01 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         className={cn(
           "absolute inset-0 h-full w-full will-change-[filter,opacity,transform]",

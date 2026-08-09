@@ -53,7 +53,8 @@ export const useAuthStore = create<AuthStore>()(
               current.wallet?.bidBalance === user.wallet?.bidBalance &&
               current.fullName === user.fullName &&
               current.status === user.status &&
-              current.blocked === user.blocked;
+              current.blocked === user.blocked &&
+              current.role === user.role;
 
             if (same) {
               return state;

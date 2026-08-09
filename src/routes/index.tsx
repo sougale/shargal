@@ -1,10 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  artworks as staticArtworks,
-  changeMetArtWorkProps,
-} from "@/data/artworks";
+import { changeMetArtWorkProps } from "@/data/artworks";
 import { categories } from "@/data/categories";
-import { getArtist } from "@/data/artists";
 import { ArtworkCard } from "@/components/site/ArtworkCard";
 import { HeroCarousel } from "@/components/site/HeroCarousel";
 import { ImageCarousel } from "@/components/site/ImageCarousel";
@@ -12,11 +8,8 @@ import { PartnerReasons } from "@/components/site/PartnerReasons";
 import { Sponsors } from "@/components/site/Sponsors";
 import { FaqAccordion } from "@/components/site/FaqAccordion";
 import { HistoryTimeline } from "@/components/site/HistoryTimeline";
-import { useChicagoArtworksByCategory } from "@/queries";
 import { useMetArtworks } from "@/hooks/useMetArtWork";
 import { Loader } from "@/components/site/Loader";
-import { useArtInstitute } from "@/hooks/useChicagoArt";
-import { type ChicagoArtwork, getChicagoImageUrl } from "@/queries/chicago";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -47,39 +40,26 @@ export interface ModChicagoArtwork {
 }
 
 function HomePage() {
-  // Local static data (highlights, etc.)
-  const highlights = staticArtworks.filter((a) => a.highlight).slice(0, 8);
-  const newArrivals = staticArtworks.filter((a) => a.year >= 2025).slice(0, 8);
-
   // === TanStack Query powered fetches (best practice) ===
+  // Met images load in browsers; Art Institute IIIF is Cloudflare-blocked in prod.
   const { artworks: metArtworks, isLoading } = useMetArtworks();
-  const modMetArtworks = changeMetArtWorkProps(metArtworks);
-  // const { data, isLoading: caLoading } = useChicagoArtworksByCategory("Painting", 20);
-  const { artworks: data, loading: caLoading } = useArtInstitute();
+  const modMetArtworks = changeMetArtWorkProps(metArtworks).filter(
+    (a) => typeof a.image === "string" && a.image.trim() !== "",
+  );
 
-  // Transform for display (Chicago data needs light mapping for ImageCarousel)
-  // Filter out records without a usable image_id, then drop any resulting item
-  // whose final `image` property is an empty string (or not ready).
-  const chicagoArtworks = (data ?? [])
-    .filter(
-      (a): a is ChicagoArtwork & { image_id: string; medium: string } =>
-        typeof a.image_id === "string" &&
-        a.image_id.trim() !== "" &&
-        !!a.medium_display,
-    )
-    .map((a) => ({
-      id: a.id,
-      image: getChicagoImageUrl(a.image_id),
-      title: a.title,
-      price: 1200 + (a.id % 8000),
-      height: a.thumbnail?.height || 600,
-      width: a.thumbnail?.width || 800,
-      name: a.artist_display || "Unknown",
-      medium: a.medium_display || "N/A",
-    }))
-    .filter((a) => typeof a.image === "string" && a.image.trim() !== "");
+  // Shape Met works for ImageCarousel (same card contract as former Chicago list).
+  const carouselArtworks: ModChicagoArtwork[] = modMetArtworks.map((a, i) => ({
+    id: Number(a.slug) || i,
+    image: a.image,
+    title: a.title,
+    price: a.price,
+    height: a.height || 600,
+    width: a.width || 800,
+    name: a.artist || "Unknown",
+    medium: a.medium || "N/A",
+  }));
 
-  if (isLoading || caLoading) {
+  if (isLoading && modMetArtworks.length === 0) {
     return (
       <>
         <div className="min-h-screen min-w-screen bg-canvas"></div>
@@ -120,7 +100,7 @@ function HomePage() {
       </section>
 
       <ImageCarousel
-        artworks={chicagoArtworks}
+        artworks={carouselArtworks}
         eyebrow="The curator has chosen"
         title="Highlights of the season"
         link={{ to: "/gallery", label: "All works" }}
@@ -145,24 +125,22 @@ function HomePage() {
           </Link>
         </div>
 
-        {modMetArtworks.length === 0
-          ? (
-            <Loader
-              message="Loading Selected Works..."
-              className="py-16 md:py-24"
-            />
-          )
-          : (
-            <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
-              {modMetArtworks.slice(0, 6).map((a, i) => (
-                <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
-              ))}
-            </div>
-          )}
+        {modMetArtworks.length === 0 ? (
+          <Loader
+            message="Loading Selected Works..."
+            className="py-16 md:py-24"
+          />
+        ) : (
+          <div className="columns-1 gap-8 md:columns-2 lg:columns-3">
+            {modMetArtworks.slice(0, 6).map((a, i) => (
+              <ArtworkCard key={a.slug} artwork={a} priority={i < 3} />
+            ))}
+          </div>
+        )}
       </section>
 
       <ImageCarousel
-        artworks={chicagoArtworks.slice(8)}
+        artworks={carouselArtworks.slice(8)}
         eyebrow="Newly arrived"
         title="From the studios, this season"
       />

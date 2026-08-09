@@ -18,14 +18,12 @@ import { WalletProvider } from "@/lib/wallet";
 import ArtWorkProvider from "@/lib/useMetArtworksStore";
 import { ToastProvider } from "@/components/ui/toast";
 import { FirebaseProvider } from "@/providers/FirebaseProvider";
-import { AnimatePresence, motion } from "motion/react";
 import { useAuthListener } from "@/hooks/useAuthListener";
 import { useAuthStore } from "@/store/zustand";
 import { useAuctionAutoCloser } from "@/hooks/useAuctionAutoCloser";
 import { WalletLoader } from "@/components/wallet/WalletLoader";
 import { WalletError } from "@/components/wallet/WalletError";
-import type { WalletAccount } from "@/types/walletTypes";
-import { useEffect } from "react";
+import { PageTransition } from "@/components/site/PageTransition";
 // IMPORTANT: Do NOT import or call React Query hooks directly in this file.
 // All useQuery / useFirebaseQueryCollection calls must happen inside components rendered *after* <QueryClientProvider>.
 
@@ -180,20 +178,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Single stable selector for both pathname (branching) and routeKey (animations).
-  // Using two separate useRouterState calls can cause one render where pathname
-  // has updated but routeKey hasn't (or vice versa), which makes the old page
-  // briefly remain visible before AnimatePresence reacts. This is the root cause
-  // of the "previous page still displays" flash on navigation.
-  const { pathname, routeKey } = useRouterState({
-    select: (s) => {
-      const p = s.location.pathname;
-      return {
-        pathname: p,
-        routeKey: `${p}${s.location.searchStr ?? ""}`,
-      };
-    },
-  });
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isWallet = pathname === "/wallet" || pathname.startsWith("/wallet/");
   const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/");
@@ -264,34 +249,9 @@ function RootComponent() {
                   <div className="flex min-h-screen flex-col bg-canvas">
                     <MegaNav />
                     <main className="flex-1">
-                      {/*
-                        Reliable TanStack Router + framer-motion page transition.
-
-                        The ROOT CAUSE of "previous page still displays just before the new page renders"
-                        is that the old route tree stays mounted while the new one starts rendering.
-
-                        Fixes:
-                        - mode="wait": The old <motion.div> must finish its exit animation + unmount
-                          BEFORE the new one is inserted into the DOM.
-                        - Exit is a fast pure fade (no y transform) so the old page disappears
-                          cleanly in place with zero visual trace.
-                        - Enter is a very subtle, short slide + fade for a calm gallery feel.
-                        - Key includes search params so filtered views also trigger transitions.
-                      */}
-                      <AnimatePresence mode="wait">
-                        <motion.div
-                          key={routeKey}
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0 }}
-                          transition={{
-                            duration: 0.22,
-                            ease: [0.22, 1, 0.36, 1],
-                          }}
-                        >
-                          <Outlet />
-                        </motion.div>
-                      </AnimatePresence>
+                      <PageTransition>
+                        <Outlet />
+                      </PageTransition>
                     </main>
                     <Footer />
                   </div>

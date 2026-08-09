@@ -72,9 +72,14 @@ export const useArtInstitute = (options?: { initialCategory?: string }) => {
     { name: "Drawing" },
   ];
 
-  const defaultCategory =
-    options?.initialCategory ||
-    MET_ARTWORK_SEARCH_TERMS[Math.floor(Math.random() * categories.length)]; // stable default for SSR hydration
+  // Must be stable across renders — recomputing Math.random() each render
+  // changes the query key and can leave the homepage stuck on "Loading…".
+  const [defaultCategory] = React.useState(
+    () =>
+      options?.initialCategory ||
+      categories[Math.floor(Math.random() * categories.length)]?.name ||
+      "Painting",
+  );
 
   // Main artworks query (category-based)
   const artworksQuery = useQuery({

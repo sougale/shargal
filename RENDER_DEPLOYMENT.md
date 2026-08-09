@@ -60,8 +60,8 @@ This guide walks you through deploying the Starstruck Gallery TanStack Start app
 
 The application uses Vite and TanStack Start, which requires:
 
-- **Build Command**: `npm install && npm run build` - This installs dependencies and builds the production bundle
-- **Start Command**: `node render-server.js` (or `npm run start`) - wraps TanStack Start's `fetch` handler in a Node HTTP server
+- **Build Command**: `npm install && npm run build` — required. Do **not** use `npm install` alone; `dist/` is gitignored and must be built on Render.
+- **Start Command**: `node render-server.js` (or `npm run start`) — wraps TanStack Start's `fetch` handler in a Node HTTP server
 
 ### Port Configuration
 

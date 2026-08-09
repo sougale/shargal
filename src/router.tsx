@@ -25,6 +25,9 @@ export const getRouter = () => {
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,
+    // Crossfade via document.startViewTransition so the previous page
+    // is snapshotted (not left mounted) during navigation.
+    defaultViewTransition: true,
   });
 
   return router;

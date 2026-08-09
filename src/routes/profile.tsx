@@ -76,32 +76,32 @@ function ProfilePage() {
 
   return (
     <>
-      {user && user.role == "user" ? (
+      {user?.role === "admin" ? (
         <div className="mx-auto flex max-w-7xl flex-wrap bg-detail/5 items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
-          <span>Wallet connected · {user?.fullName} </span>
+          <span>
+            {user.fullName} ·{" "}
+            <Link to="/admin" className="underline leading-0.5">
+              Go To Admin Dashboard
+            </Link>
+          </span>
+        </div>
+      ) : user ? (
+        <div className="mx-auto flex max-w-7xl flex-wrap bg-detail/5 items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
+          <span>Wallet connected · {user.fullName} </span>
           <div className="flex justify-between w-full items-center">
             <div className="flex items-center gap-1">
               <DollarSign className="size-4" />
-              {formatBid(user?.wallet.balance ?? 0)}
+              {formatBid(user.wallet.balance ?? 0)}
               <p>·</p>
               <Gavel className="size-4" />
-              {formatBid(user?.wallet.bidBalance ?? 0)}
+              {formatBid(user.wallet.bidBalance ?? 0)}
             </div>
             <Link to="/wallet" className="text-ink hover:text-clay block">
               Open wallet →
             </Link>
           </div>
         </div>
-      ) : (
-        <div className="mx-auto flex max-w-7xl flex-wrap bg-detail/5 items-center justify-between gap-3 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-detail">
-          <span>
-            {user?.fullName} ·{" "}
-            <Link to="/admin" className="underline leading-0.5">
-              Go To Admin Dashboard
-            </Link>
-          </span>
-        </div>
-      )}
+      ) : null}
       <PageHeader eyebrow="Your account" title="Profile" />
 
       <section className="mx-auto grid max-w-7xl gap-12 px-6 pb-24 lg:grid-cols-[1fr_1.4fr]">

@@ -98,6 +98,8 @@ export function ImageCarousel({ artworks, eyebrow, title, link }: Props) {
                     <SmartImage
                       src={a.image}
                       alt={`${a.title} by ${a.name}`}
+                      width={a.width || 800}
+                      height={a.height || 1000}
                       className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.03]"
                     />
                   </div>

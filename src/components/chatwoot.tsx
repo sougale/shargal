@@ -9,47 +9,66 @@ declare global {
       hideMessageBubble?: boolean;
       widgetStyle?: "classic" | "flat";
       baseDomain?: string;
-      // Positioning offsets
-      customAttributes?: Record<string, unknown>;
+      darkMode?: "light" | "auto";
+      locale?: string;
     };
     chatwootSDK: {
       run: (config: { websiteToken: string; baseUrl: string }) => void;
     };
+    $chatwoot?: {
+      toggleBubbleVisibility: (state: "hide" | "show") => void;
+      setUser?: (identifier: string, user: Record<string, unknown>) => void;
+      reset?: () => void;
+    };
   }
 }
+
 interface Props {
+  /** When true, the launcher bubble is hidden (e.g. on admin routes). */
   hide?: boolean;
 }
 
+const BASE_URL = "https://app.chatwoot.com";
+const WEBSITE_TOKEN = "1zEDdCc9DsEHC91HtyqrXGkf";
+const SCRIPT_ID = "chatwoot-sdk";
+
+/**
+ * Loads the Chatwoot live-chat widget once for the app shell.
+ * Mount from the root route so visitors can reach support from any public page.
+ */
 export default function Chatwoot({ hide = false }: Props) {
   useEffect(() => {
-    const BASE_URL = "https://app.chatwoot.com";
+    if (typeof window === "undefined") return;
 
-    // Must be set before the SDK script loads
     window.chatwootSettings = {
-      position: "right", // "left" | "right"
+      position: "right",
       type: "standard",
-      hideMessageBubble: hide, // "standard" | "expanded_bubble"
-      customAttributes: {
-        // widgetStyle: "classic",
-        offsetX: "120px", // Horizontal offset
-        offsetY: "120px",
-      },
-      // Vertical offset
+      hideMessageBubble: hide,
+      darkMode: "light",
+      locale: "en",
     };
 
-    const g = document.createElement("script") as HTMLScriptElement;
-    const s = document.getElementsByTagName("script")[0];
-    g.src = BASE_URL + "/packs/js/sdk.js";
-    g.async = true;
-    s.parentNode?.insertBefore(g, s);
-    g.onload = function () {
+    const existing = document.getElementById(SCRIPT_ID);
+    if (existing) {
+      window.$chatwoot?.toggleBubbleVisibility(hide ? "hide" : "show");
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.id = SCRIPT_ID;
+    script.src = `${BASE_URL}/packs/js/sdk.js`;
+    script.async = true;
+    script.onload = () => {
       window.chatwootSDK.run({
-        websiteToken: "1zEDdCc9DsEHC91HtyqrXGkf",
+        websiteToken: WEBSITE_TOKEN,
         baseUrl: BASE_URL,
       });
+      if (hide) {
+        window.$chatwoot?.toggleBubbleVisibility("hide");
+      }
     };
-  }, []);
+    document.body.appendChild(script);
+  }, [hide]);
 
   return null;
 }

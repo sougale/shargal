@@ -1,0 +1,13 @@
+{
+  "session_id": "",
+  "files_read": {
+    "/Users/apple/Documents/code/shargal/README.md": {
+      "count": 1,
+      "tokens": 2655,
+      "first_read": "2026-08-11T22:59:55.736Z"
+    }
+  },
+  "anatomy_hits": 1,
+  "anatomy_misses": 0,
+  "repeated_reads_warned": 0
+}

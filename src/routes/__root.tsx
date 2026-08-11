@@ -24,6 +24,7 @@ import { useAuctionAutoCloser } from "@/hooks/useAuctionAutoCloser";
 import { WalletLoader } from "@/components/wallet/WalletLoader";
 import { WalletError } from "@/components/wallet/WalletError";
 import { PageTransition } from "@/components/site/PageTransition";
+import Chatwoot from "@/components/chatwoot";
 // IMPORTANT: Do NOT import or call React Query hooks directly in this file.
 // All useQuery / useFirebaseQueryCollection calls must happen inside components rendered *after* <QueryClientProvider>.
 
@@ -261,6 +262,9 @@ function RootComponent() {
           </WalletProvider>
         </FirebaseProvider>
       </StoreProvider>
+
+      {/* Live chat: public + wallet surfaces; hidden in admin console */}
+      <Chatwoot hide={isAdmin} />
 
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>

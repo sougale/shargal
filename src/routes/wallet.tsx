@@ -24,11 +24,8 @@ import { TxRow } from "@/components/wallet/TxRow";
 import { formatMoney } from "@/utils";
 import { useAuthStore, useDataStore } from "@/store/zustand";
 import { txSign } from "@/lib/wallet";
-import { requireAuth } from "@/lib/routeGuards";
-
 export const Route = createFileRoute("/wallet")({
   component: WalletDashboard,
-  beforeLoad: requireAuth,
   head: () => ({ meta: [{ title: "EmberPay — Sharjahbiennial Wallet" }] }),
 });
 

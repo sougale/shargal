@@ -1,4 +1,17 @@
 {
   "version": 1,
-  "bugs": []
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-08-19T20:40:00Z",
+      "error_message": "Don't have a wallet? Create one link on /connect validates form instead of navigating to wallet signup",
+      "file": "src/routes/wallet.tsx, src/routes/connect.tsx",
+      "root_cause": "/wallet had beforeLoad: requireAuth which redirected unauthenticated users back to /connect; create-wallet link inside form triggered onBlur validation on click",
+      "fix": "Removed requireAuth from /wallet (WalletShell already shows AuthForms for guests); moved create-wallet link outside the connect form; set form validation to onSubmit only; onMouseDown preventDefault on link to stop blur re-render swallowing first click",
+      "tags": ["wallet", "connect", "routing", "auth"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "status": "fixed"
+    }
+  ]
 }

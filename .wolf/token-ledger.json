@@ -2,16 +2,234 @@
   "version": 1,
   "created_at": "2026-08-11T22:59:37.857Z",
   "lifetime": {
-    "total_tokens_estimated": 0,
-    "total_reads": 0,
-    "total_writes": 0,
-    "total_sessions": 0,
-    "anatomy_hits": 0,
-    "anatomy_misses": 0,
-    "repeated_reads_blocked": 0,
-    "estimated_savings_vs_bare_cli": 0
+    "total_tokens_estimated": 93955,
+    "total_reads": 18,
+    "total_writes": 15,
+    "total_sessions": 1,
+    "anatomy_hits": 10,
+    "anatomy_misses": 2,
+    "repeated_reads_blocked": 8,
+    "estimated_savings_vs_bare_cli": 14344
   },
-  "sessions": [],
+  "sessions": [
+    {
+      "id": "session-2026-08-19-2037",
+      "started": "2026-08-19T19:37:45.807Z",
+      "ended": "2026-08-19T19:40:31.614Z",
+      "reads": [
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2773,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.tsx",
+          "tokens_estimated": 3399,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/components/site/WalletGate.tsx",
+          "tokens_estimated": 692,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/lib/routeGuards.ts",
+          "tokens_estimated": 561,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/components/wallet/AuthForms.tsx",
+          "tokens_estimated": 3821,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/components/wallet/WalletShell.tsx",
+          "tokens_estimated": 5354,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.withdraw.tsx",
+          "tokens_estimated": 4403,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.deposit.tsx",
+          "tokens_estimated": 4402,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/.cursor/projects/Users-apple-Documents-code-shargal/terminals/1.txt",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.tsx",
+          "tokens_estimated": 3377,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2768,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2768,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2772,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2772,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2777,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 25405,
+        "output_tokens_estimated": 17234,
+        "reads_count": 9,
+        "writes_count": 6,
+        "repeated_reads_blocked": 4,
+        "anatomy_lookups": 5
+      }
+    },
+    {
+      "id": "session-2026-08-19-2037",
+      "started": "2026-08-19T19:37:45.807Z",
+      "ended": "2026-08-19T19:42:43.446Z",
+      "reads": [
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2773,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.tsx",
+          "tokens_estimated": 3399,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/components/site/WalletGate.tsx",
+          "tokens_estimated": 692,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/lib/routeGuards.ts",
+          "tokens_estimated": 561,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/components/wallet/AuthForms.tsx",
+          "tokens_estimated": 3821,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/components/wallet/WalletShell.tsx",
+          "tokens_estimated": 5354,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.withdraw.tsx",
+          "tokens_estimated": 4403,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.deposit.tsx",
+          "tokens_estimated": 4402,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "/Users/apple/.cursor/projects/Users-apple-Documents-code-shargal/terminals/1.txt",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/wallet.tsx",
+          "tokens_estimated": 3377,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2768,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2768,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2772,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2772,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2777,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2881,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2898,
+          "action": "create"
+        },
+        {
+          "file": "/Users/apple/Documents/code/shargal/src/routes/connect.tsx",
+          "tokens_estimated": 2898,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 25405,
+        "output_tokens_estimated": 25911,
+        "reads_count": 9,
+        "writes_count": 9,
+        "repeated_reads_blocked": 4,
+        "anatomy_lookups": 5
+      }
+    }
+  ],
   "daemon_usage": [],
   "waste_flags": [],
   "optimization_report": {

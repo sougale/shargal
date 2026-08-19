@@ -12,6 +12,7 @@
 
 - **Project:** tanstack_start_ts
 - **Description:** A modern, exhibition-grade digital art platform built with React 19, TanStack Router, and TanStack Query. Aethelred enables collectors to browse curated artworks, participate in live auctions, manage 
+- **`/wallet` route:** Must NOT use `requireAuth` — `WalletShell` renders `AuthForms` for unauthenticated users; sub-routes are gated inside the shell by login/status checks.
 
 ## Do-Not-Repeat
 

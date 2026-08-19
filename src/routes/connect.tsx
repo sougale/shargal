@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { KeyRound, Wallet as WalletIcon, CheckCircle2 } from "lucide-react";
+import { type FormEvent, useState } from "react";
+import { CheckCircle2, KeyRound, Wallet as WalletIcon } from "lucide-react";
 import { PageHeader } from "@/components/site/PageHeader";
 import { useAuthStore } from "@/store/zustand";
 import { findObj } from "@/utils";
@@ -61,7 +61,8 @@ function ConnectPage() {
 
   const formControl = useForm({
     resolver: zodResolver(tokenSchema),
-    mode: "onBlur",
+    mode: "onSubmit",
+    reValidateMode: "onSubmit",
     defaultValues: {
       token: "",
     },
@@ -151,95 +152,103 @@ function ConnectPage() {
 
       <section className="mx-auto grid max-w-5xl gap-12 px-6 pb-32 pt-6 lg:grid-cols-[1.2fr_1fr]">
         <div className="border border-ink/15 p-8 md:p-10">
-          {connected ? (
-            <div>
-              <div className="flex items-center gap-3 border-b border-ink/10 pb-5">
-                <CheckCircle2 className="size-5 text-clay" strokeWidth={1.4} />
-                <p className="text-[11px] uppercase tracking-[0.3em] text-clay">
-                  Wallet connected
+          {connected
+            ? (
+              <div>
+                <div className="flex items-center gap-3 border-b border-ink/10 pb-5">
+                  <CheckCircle2
+                    className="size-5 text-clay"
+                    strokeWidth={1.4}
+                  />
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-clay">
+                    Wallet connected
+                  </p>
+                </div>
+                <p className="mt-6 font-display text-3xl italic">
+                  {connected.fullName}
                 </p>
-              </div>
-              <p className="mt-6 font-display text-3xl italic">
-                {connected.fullName}
-              </p>
-              <p className="text-sm text-detail">{connected.email}</p>
-              <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">
-                Balance
-              </p>
-              <p className="font-display text-4xl italic">{}</p>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link
-                  to="/profile"
-                  className="border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
-                >
-                  Go to profile
-                </Link>
-                <Link
-                  to="/wallet"
-                  className="border border-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
-                >
-                  Open wallet
-                </Link>
-                <button
-                  onClick={() => {
-                    logOut();
-                    toast.reserved({
-                      title: "Logout Successful",
-                      description: "Wallet Disconnected",
-                    });
-                  }}
-                  className="border border-clay/60 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-clay hover:border-clay hover:text-clay"
-                >
-                  Disconnect
-                </button>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={submit}>
-              <div className="flex items-center gap-3">
-                <span className="grid size-10 place-items-center bg-clay/10 text-clay">
-                  <KeyRound className="size-4" strokeWidth={1.5} />
-                </span>
-                <p className="text-[10px] uppercase tracking-[0.3em] text-detail">
-                  Wallet token
+                <p className="text-sm text-detail">{connected.email}</p>
+                <p className="mt-4 text-[10px] uppercase tracking-[0.22em] text-detail">
+                  Balance
                 </p>
+                <p className="font-display text-4xl italic">{}</p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    to="/profile"
+                    className="border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+                  >
+                    Go to profile
+                  </Link>
+                  <Link
+                    to="/wallet"
+                    className="border border-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] hover:bg-ink hover:text-canvas"
+                  >
+                    Open wallet
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logOut();
+                      toast.reserved({
+                        title: "Logout Successful",
+                        description: "Wallet Disconnected",
+                      });
+                    }}
+                    className="border border-clay/60 px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-clay hover:border-clay hover:text-clay"
+                  >
+                    Disconnect
+                  </button>
+                </div>
               </div>
+            )
+            : (
+              <>
+                <form onSubmit={submit}>
+                  <div className="flex items-center gap-3">
+                    <span className="grid size-10 place-items-center bg-clay/10 text-clay">
+                      <KeyRound className="size-4" strokeWidth={1.5} />
+                    </span>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-detail">
+                      Wallet token
+                    </p>
+                  </div>
 
-              <input
-                {...register("token", {
-                  required: true,
-                })}
-                placeholder="AET-XXXX-XXXX-XXXX"
-                className="mt-5 w-full border border-ink/20 bg-canvas px-4 py-4 font-mono text-base tracking-widest text-ink focus:border-ink focus:outline-none"
-                autoFocus
-              />
+                  <input
+                    {...register("token", {
+                      required: true,
+                    })}
+                    placeholder="AET-XXXX-XXXX-XXXX"
+                    className="mt-5 w-full border border-ink/20 bg-canvas px-4 py-4 font-mono text-base tracking-widest text-ink focus:border-ink focus:outline-none"
+                    autoFocus
+                  />
 
-              {typeof error == "string" && (
-                <p className="mt-3 border border-clay/40 bg-clay/5 px-3 py-2 text-xs text-clay">
-                  {error}
+                  {typeof error == "string" && (
+                    <p className="mt-3 border border-clay/40 bg-clay/5 px-3 py-2 text-xs text-clay">
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={!isValid || isLoading || isSubmitting}
+                    className="mt-6 w-full disabled:pointer-events-none disabled:opacity-80 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
+                  >
+                    Connect wallet
+                  </button>
+                </form>
+
+                <p className="mt-5 text-xs text-detail">
+                  Don't have a wallet?{" "}
+                  <Link
+                    to="/wallet"
+                    onMouseDown={(e) => e.preventDefault()}
+                    className="text-ink underline underline-offset-4"
+                  >
+                    Create one in under a minute →
+                  </Link>
                 </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={!isValid || isLoading || isSubmitting}
-                className="mt-6 w-full disabled:pointer-events-none disabled:opacity-80 border border-ink bg-ink px-6 py-3 text-[11px] uppercase tracking-[0.22em] text-canvas hover:bg-clay hover:border-clay"
-              >
-                Connect wallet
-              </button>
-
-              <p className="mt-5 text-xs text-detail">
-                Don't have a wallet?{" "}
-                <Link
-                  to="/wallet"
-                  className="text-ink underline underline-offset-4"
-                >
-                  Create one in under a minute →
-                </Link>
-              </p>
-            </form>
-          )}
+              </>
+            )}
         </div>
 
         <aside className="border border-ink/10 bg-surface/40 p-8">

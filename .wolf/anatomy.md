@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-08-11T22:59:56.862Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-08-19T19:42:17.582Z
 > Files: 212 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -238,7 +238,7 @@
 - `cart.tsx` — Route (~2471 tok)
 - `categories.$slug.tsx` — Route — uses useMemo — Remix loader (~487 tok)
 - `categories.index.tsx` — import { artworks } from "@/data/artworks"; (~686 tok)
-- `connect.tsx` — Route — renders form — uses useNavigate, useState, useEffect, useForm (~2773 tok)
+- `connect.tsx` — Route — renders form (~2898 tok)
 - `contact.tsx` — Route — renders form — uses useState (~1622 tok)
 - `favourites.tsx` — import { artworks } from "@/data/artworks"; (~551 tok)
 - `gallery.tsx` — Route — uses useMemo (~1236 tok)

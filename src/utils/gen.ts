@@ -199,7 +199,7 @@ export function getUserName(email: string) {
 }
 
 export async function photoFN(file: File) {
-  const { endpoint, project_id, str_id } = appwriteConfig;
+  const { endpoint, project_id, str_id } = appWriteConfig;
 
   try {
     const client = new Client().setEndpoint(endpoint).setProject(project_id);

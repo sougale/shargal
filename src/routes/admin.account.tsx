@@ -114,7 +114,7 @@ function AdminAccountPage() {
     useShallow((s) => ({
       wallets: s.wallets,
       setState: s.setState,
-    })),
+    }))
   );
 
   console.log({ wallets });
@@ -158,7 +158,12 @@ function AdminAccountPage() {
 
   return (
     <>
-      <AdminLoader isLoading={loading} fullscreen message={loadingText} variant="action" />
+      <AdminLoader
+        isLoading={loading}
+        fullscreen
+        message={loadingText}
+        variant="action"
+      />
 
       <div className="mx-auto w-full max-w-6xl space-y-6">
         {/* Header */}
@@ -169,7 +174,8 @@ function AdminAccountPage() {
               Account & crypto wallets
             </h1>
             <p className="mt-1 text-sm text-[var(--a-muted)]">
-              Manage your administrator Profile and the treasury wallets used for platform payouts.
+              Manage your administrator Profile and the treasury wallets used
+              for platform payouts.
             </p>
           </div>
           {/* <button
@@ -212,7 +218,11 @@ function AdminAccountPage() {
                 <InfoRow icon={Key} label="Password" value={user.password} />
                 {/* <InfoRow icon={Phone} label="Phone" value={user.phone} />
                 <InfoRow icon={MapPin} label="Location" value={user.location} /> */}
-                <InfoRow icon={Calendar} label="Joined" value={user.joinedDate} />
+                <InfoRow
+                  icon={Calendar}
+                  label="Joined"
+                  value={user.joinedDate}
+                />
               </dl>
             </div>
           </div>
@@ -249,7 +259,9 @@ function AdminAccountPage() {
                         <span className="grid size-7 shrink-0 place-items-center rounded-md bg-[var(--a-surface)] text-[var(--a-fg-2)]">
                           <WalletIcon className="size-3.5" />
                         </span>
-                        <h4 className="truncate text-sm font-bold text-[var(--a-fg)]">{w.name}</h4>
+                        <h4 className="truncate text-sm font-bold text-[var(--a-fg)]">
+                          {w.name}
+                        </h4>
                         {w.isDefault && (
                           <span className="rounded-full border border-[var(--a-pos)]/30 bg-[var(--a-pos)]/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--a-pos)]">
                             Default
@@ -263,7 +275,9 @@ function AdminAccountPage() {
                         {w.address}
                       </p>
                       {w.memo && (
-                        <p className="mt-1.5 text-[11px] text-[var(--a-muted)]">Memo: {w.memo}</p>
+                        <p className="mt-1.5 text-[11px] text-[var(--a-muted)]">
+                          Memo: {w.memo}
+                        </p>
                       )}
                     </div>
                     <div className="flex shrink-0 items-center gap-1.5">
@@ -418,8 +432,12 @@ function EmptyWallets({ onAdd }: { onAdd: () => void }) {
   return (
     <div className="grid place-items-center rounded-xl border border-dashed border-[var(--a-border)] px-6 py-12 text-center">
       <WalletIcon className="size-8 text-[var(--a-muted)]" />
-      <p className="mt-3 text-sm font-semibold text-[var(--a-fg)]">No wallets yet</p>
-      <p className="mt-1 max-w-sm text-xs text-[var(--a-muted)]">Upload your first crypto wallet</p>
+      <p className="mt-3 text-sm font-semibold text-[var(--a-fg)]">
+        No wallets yet
+      </p>
+      <p className="mt-1 max-w-sm text-xs text-[var(--a-muted)]">
+        Upload your first crypto wallet
+      </p>
       <button
         onClick={onAdd}
         className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-[var(--a-accent)] px-3 py-1.5 text-xs font-bold text-[var(--a-accent-ink)] hover:bg-[var(--a-accent-hi)]"
@@ -432,7 +450,11 @@ function EmptyWallets({ onAdd }: { onAdd: () => void }) {
 
 /* ------------ Zod schema + types ------------ */
 const walletFormSchema = z.object({
-  name: z.string().trim().min(1, "Name is required.").max(80, "Label too long (max 80)."),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required.")
+    .max(80, "Label too long (max 80)."),
   network: z.string().min(1, { message: "Network is required" }),
   address: z
     .string()
@@ -444,7 +466,7 @@ const walletFormSchema = z.object({
     .refine((file) => file.size <= 5000000, `Max size 5MB.`)
     .refine(
       (file) => ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-      "Supported: .jpg, .png, .webp",
+      "Supported: .jpg, .png, .webp"
     ),
   memo: z.string().min(1, { message: "Note is required" }).trim(),
   isDefault: z.boolean().default(false),
@@ -696,7 +718,13 @@ function WalletFormModal({
 const inputCls =
   "w-full rounded-md border border-[var(--a-border)] bg-[var(--a-input)] px-3 py-2 text-base text-[var(--a-fg)] outline-none focus:border-[var(--a-border-hi)]";
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <label className="a-eyebrow mb-1.5 block">{label}</label>

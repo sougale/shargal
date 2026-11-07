@@ -229,7 +229,7 @@ export function AdminSpinner({ className }: { className?: string }) {
         className
       )}
     >
-      <Loader2 className="size-3.5 animate-spin" />
+      <Loader2 className="size-4 animate-spin" />
       <span className="text-[10px] tracking-[1.5px] font-medium">WORKING</span>
     </span>
   );

@@ -15,13 +15,22 @@ interface FirebaseData {
 
 const FirebaseContext = createContext<FirebaseData | null>(null);
 
-export function FirebaseProvider({ children }: { children: ReactNode }): ReactNode {
+export function FirebaseProvider({
+  children,
+}: {
+  children: ReactNode;
+}): ReactNode {
   // Safe here because this runs inside QueryClientProvider
   const data = useFirebaseDataHook();
 
   return (
     <FirebaseContext.Provider
-      value={{ ...data, notifications: (data as any).notifications ?? [] } as FirebaseData}
+      value={
+        {
+          ...data,
+          notifications: (data as any).notifications ?? [],
+        } as FirebaseData
+      }
     >
       {children}
     </FirebaseContext.Provider>

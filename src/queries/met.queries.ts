@@ -2,14 +2,21 @@
 // TanStack Query options for The Metropolitan Museum of Art API
 
 import { queryOptions, infiniteQueryOptions } from "@tanstack/react-query";
-import { searchMetArtworks, getMetArtworksByIds, searchMetByArtist } from "./met";
+import {
+  searchMetArtworks,
+  getMetArtworksByIds,
+  searchMetByArtist,
+} from "./met";
 import type { MetArtwork } from "../types/metTypes";
 
 const PAGE_SIZE = 12;
 
 export const metQueries = {
   // Search artworks (returns IDs + total)
-  search: (query: string, options?: { hasImages?: boolean; isPublicDomain?: boolean }) =>
+  search: (
+    query: string,
+    options?: { hasImages?: boolean; isPublicDomain?: boolean }
+  ) =>
     queryOptions({
       queryKey: ["met", "search", query, options],
       queryFn: () => searchMetArtworks(query, options),
@@ -30,7 +37,9 @@ export const metQueries = {
     queryOptions({
       queryKey: ["met", "artist", name],
       queryFn: async () => {
-        const { objectIDs, total } = await searchMetByArtist(name, { hasImages: true });
+        const { objectIDs, total } = await searchMetByArtist(name, {
+          hasImages: true,
+        });
         if (!objectIDs?.length) return { artist: null, artworks: [], total: 0 };
 
         const artworks = await getMetArtworksByIds(objectIDs, PAGE_SIZE);
@@ -49,7 +58,9 @@ export const metQueries = {
     infiniteQueryOptions({
       queryKey: ["met", "artist", artistName, "infinite"],
       queryFn: async ({ pageParam = 0 }) => {
-        const { objectIDs } = await searchMetByArtist(artistName, { hasImages: true });
+        const { objectIDs } = await searchMetByArtist(artistName, {
+          hasImages: true,
+        });
         if (!objectIDs?.length) return [];
 
         const start = pageParam * PAGE_SIZE;
@@ -71,7 +82,7 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 
 export function useMetSearch(
   query: string,
-  options?: { hasImages?: boolean; isPublicDomain?: boolean },
+  options?: { hasImages?: boolean; isPublicDomain?: boolean }
 ) {
   return useQuery(metQueries.search(query, options));
 }

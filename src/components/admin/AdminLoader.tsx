@@ -56,7 +56,7 @@ export function AdminLoader({
       : partial
         ? "flex w-full items-center justify-center py-8"
         : "flex w-full items-center justify-center",
-    className,
+    className
   );
 
   const cardClasses = partial
@@ -68,7 +68,7 @@ export function AdminLoader({
       className={cn(
         "flex flex-col items-center text-center",
         isAction ? "gap-6" : "gap-7",
-        !partial && "max-w-sm px-6",
+        !partial && "max-w-sm px-6"
       )}
     >
       {/* Icon cluster */}
@@ -89,16 +89,24 @@ export function AdminLoader({
           className="absolute size-[66px] rounded-full border"
           style={{ borderColor: "var(--a-accent)", opacity: 0.15 }}
           animate={{ scale: [1, 1.18, 1], opacity: [0.15, 0.05, 0.15] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+          transition={{
+            duration: 2.4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.4,
+          }}
         />
 
         {/* Core badge */}
         <div
           className={cn(
             "relative grid place-items-center rounded-2xl shadow-2xl ring-1 ring-[var(--a-border-hi)]",
-            isAction ? "size-14" : "size-16",
+            isAction ? "size-14" : "size-16"
           )}
-          style={{ background: "var(--a-accent)", color: "var(--a-accent-ink)" }}
+          style={{
+            background: "var(--a-accent)",
+            color: "var(--a-accent-ink)",
+          }}
         >
           {isAction ? (
             <Activity className={cn("size-7")} strokeWidth={2.5} />
@@ -122,7 +130,7 @@ export function AdminLoader({
         <p
           className={cn(
             "font-display font-semibold tracking-[-0.01em] text-[var(--a-fg)]",
-            isAction ? "text-lg" : "text-2xl",
+            isAction ? "text-lg" : "text-2xl"
           )}
         >
           {message}
@@ -138,7 +146,7 @@ export function AdminLoader({
       <div
         className={cn(
           "relative h-px w-48 overflow-hidden rounded-full",
-          isAction ? "w-40" : "w-52",
+          isAction ? "w-40" : "w-52"
         )}
         style={{ background: "var(--a-border)" }}
       >
@@ -215,7 +223,12 @@ export function AdminLoader({
 /** Tiny inline spinner for buttons or tight spaces */
 export function AdminSpinner({ className }: { className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 text-[var(--a-muted)]", className)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 text-[var(--a-muted)]",
+        className
+      )}
+    >
       <Loader2 className="size-3.5 animate-spin" />
       <span className="text-[10px] tracking-[1.5px] font-medium">WORKING</span>
     </span>

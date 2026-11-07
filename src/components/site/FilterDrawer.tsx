@@ -1,11 +1,21 @@
 import { useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 // import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { filterOptions, formatPrice } from "@/data/artworks";
 import { categories } from "@/data/categories";
-import { type Filters, type MultiKey, makeDefaultFilters } from "./filters-types";
+import {
+  type Filters,
+  type MultiKey,
+  makeDefaultFilters,
+} from "./filters-types";
 import Slider from "@mui/material/Slider";
 
 interface Props {
@@ -17,7 +27,12 @@ interface Props {
 
 const labelize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props) {
+export function FilterDrawer({
+  value,
+  onChange,
+  totalCount,
+  matchCount,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<Filters>(value);
 
@@ -29,7 +44,9 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
   const toggle = <T extends string>(key: MultiKey, item: T) => {
     setDraft((d) => {
       const arr = d[key] as unknown as T[];
-      const next = arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item];
+      const next = arr.includes(item)
+        ? arr.filter((x) => x !== item)
+        : [...arr, item];
       return { ...d, [key]: next } as Filters;
     });
   };
@@ -40,7 +57,10 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
   };
 
   const reset = () => {
-    const d = makeDefaultFilters(filterOptions.priceMin, filterOptions.priceMax);
+    const d = makeDefaultFilters(
+      filterOptions.priceMin,
+      filterOptions.priceMax
+    );
     setDraft(d);
     onChange(d);
   };
@@ -77,9 +97,17 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
     </div>
   );
 
-  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  const Section = ({
+    title,
+    children,
+  }: {
+    title: string;
+    children: React.ReactNode;
+  }) => (
     <section className="border-t border-ink/10 py-6 first:border-t-0 first:pt-0">
-      <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">{title}</h3>
+      <h3 className="mb-4 text-[10px] uppercase tracking-[0.22em] text-detail">
+        {title}
+      </h3>
       {children}
     </section>
   );
@@ -100,7 +128,9 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
         className="flex h-full w-full max-w-none flex-col gap-0 overflow-hidden bg-canvas p-0 sm:w-[440px] sm:max-w-[440px]"
       >
         <SheetHeader className="flex flex-row items-center justify-between border-b border-ink/10 px-6 py-5">
-          <SheetTitle className="font-display text-2xl italic">Refine the view</SheetTitle>
+          <SheetTitle className="font-display text-2xl italic">
+            Refine the view
+          </SheetTitle>
           {/* <button
             type="button"
             onClick={() => setOpen(false)}
@@ -141,7 +171,9 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
               options={categories.map((c) => c.slug)}
               selected={draft.category}
               onToggle={(v) => toggle("category", v)}
-              transform={(v) => categories.find((c) => c.slug === v)?.label ?? v}
+              transform={(v) =>
+                categories.find((c) => c.slug === v)?.label ?? v
+              }
             />
           </Section>
 
@@ -213,10 +245,14 @@ export function FilterDrawer({ value, onChange, totalCount, matchCount }: Props)
 
           <Section title="Highlights">
             <label className="flex items-center justify-between gap-4">
-              <span className="text-sm text-ink">Show curator's picks only</span>
+              <span className="text-sm text-ink">
+                Show curator's picks only
+              </span>
               <Switch
                 checked={draft.highlight}
-                onCheckedChange={(v) => setDraft((d) => ({ ...d, highlight: !!v }))}
+                onCheckedChange={(v) =>
+                  setDraft((d) => ({ ...d, highlight: !!v }))
+                }
               />
             </label>
           </Section>

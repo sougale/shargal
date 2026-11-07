@@ -2,7 +2,16 @@
 
 import * as React from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Check, Info, AlertTriangle, Heart, Bookmark, Share2, ShieldClose } from "lucide-react";
+import {
+  X,
+  Check,
+  Info,
+  AlertTriangle,
+  Heart,
+  Bookmark,
+  Share2,
+  ShieldClose,
+} from "lucide-react";
 import { cn } from "@/utils/gen";
 
 export type ToastVariant =
@@ -43,7 +52,13 @@ const POSITION_STYLES: Record<ToastPosition, string> = {
 };
 
 const getDirection = (pos: ToastPosition): "up" | "down" | "left" | "right" =>
-  pos.includes("top") ? "up" : pos.includes("bottom") ? "down" : pos === "left" ? "left" : "right";
+  pos.includes("top")
+    ? "up"
+    : pos.includes("bottom")
+      ? "down"
+      : pos === "left"
+        ? "left"
+        : "right";
 
 const getInitial = (dir: string) =>
   dir === "up"
@@ -182,7 +197,7 @@ function ToastItem({
       className={cn(
         "group relative flex w-full max-w-[340px] overflow-hidden rounded-2xl border bg-white/95",
         "shadow-[0_10px_32px_-16px_rgb(0,0,0,0.12),0_1px_0_0_rgb(255,255,255,0.9)_inset]",
-        styles.container,
+        styles.container
       )}
     >
       {/* Vertical accent bar (left side) */}
@@ -200,10 +215,12 @@ function ToastItem({
         <div
           className={cn(
             "mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-lg border border-ink/[0.04]",
-            styles.iconBg,
+            styles.iconBg
           )}
         >
-          <span className={cn("[&>svg]:h-3 [&>svg]:w-3", styles.iconColor)}>{icon}</span>
+          <span className={cn("[&>svg]:h-3 [&>svg]:w-3", styles.iconColor)}>
+            {icon}
+          </span>
         </div>
 
         {/* Content */}
@@ -252,7 +269,7 @@ export function Toaster() {
       (acc[pos] ||= []).push(t);
       return acc;
     },
-    {} as Record<ToastPosition, Toast[]>,
+    {} as Record<ToastPosition, Toast[]>
   );
 
   return (
@@ -265,13 +282,17 @@ export function Toaster() {
             key={pos}
             className={cn(
               "fixed z-[100] flex flex-col gap-2.5 pointer-events-none",
-              POSITION_STYLES[pos],
+              POSITION_STYLES[pos]
             )}
           >
             <AnimatePresence>
               {list.map((toast) => (
                 <div key={toast.id} className="pointer-events-auto">
-                  <ToastItem toast={toast} onDismiss={removeToast} position={pos} />
+                  <ToastItem
+                    toast={toast}
+                    onDismiss={removeToast}
+                    position={pos}
+                  />
                 </div>
               ))}
             </AnimatePresence>

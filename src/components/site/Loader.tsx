@@ -47,7 +47,7 @@ export function Loader({
   const containerClasses = fullScreen
     ? cn(
         "fixed inset-0 z-[60] flex items-center justify-center bg-canvas/70 backdrop-blur-[2px]",
-        className,
+        className
       )
     : cn(baseContainer, className);
 
@@ -72,7 +72,11 @@ export function Loader({
             />
           ))}
         </div>
-        {message && <p className="text-[10px] uppercase tracking-[0.3em] text-detail">{message}</p>}
+        {message && (
+          <p className="text-[10px] uppercase tracking-[0.3em] text-detail">
+            {message}
+          </p>
+        )}
       </div>
     );
   }
@@ -84,12 +88,16 @@ export function Loader({
         className={cn(
           "rounded-full border border-ink/15",
           sizeClasses[size],
-          variant === "default" && "border-ink/30",
+          variant === "default" && "border-ink/30"
         )}
         animate={{
           scale: [1, 1.08, 1],
           opacity: [0.4, 0.9, 0.4],
-          borderColor: ["rgba(0,0,0,0.08)", "rgba(0,0,0,0.35)", "rgba(0,0,0,0.08)"],
+          borderColor: [
+            "rgba(0,0,0,0.08)",
+            "rgba(0,0,0,0.35)",
+            "rgba(0,0,0,0.08)",
+          ],
         }}
         transition={{
           duration: 1.6,
@@ -98,7 +106,11 @@ export function Loader({
         }}
       />
 
-      {message && <p className="text-[10px] uppercase tracking-[0.3em] text-detail">{message}</p>}
+      {message && (
+        <p className="text-[10px] uppercase tracking-[0.3em] text-detail">
+          {message}
+        </p>
+      )}
     </div>
   );
 }
@@ -122,10 +134,17 @@ export function GalleryLoader({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col items-center justify-center py-12", className)}>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center py-12",
+        className
+      )}
+    >
       <Loader size="lg" variant="soft" />
       {message && (
-        <p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-detail">{message}</p>
+        <p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-detail">
+          {message}
+        </p>
       )}
     </div>
   );

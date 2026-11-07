@@ -39,10 +39,14 @@ export const getLocalData = (): typeof emptyState => {
 };
 
 const firebaseQuery = {
-  getCollection: <T>(collection: keyof Collections, options: QueryConstraint[] = []) =>
+  getCollection: <T>(
+    collection: keyof Collections,
+    options: QueryConstraint[] = []
+  ) =>
     queryOptions({
       queryKey: [collection, ...options.map((o) => JSON.stringify(o))],
-      queryFn: () => fetchCollection<T>({ collectionName: collection, options }),
+      queryFn: () =>
+        fetchCollection<T>({ collectionName: collection, options }),
       enabled: !!collection,
       staleTime: 1000 * 60 * 5, // 5 minutes
     }),
@@ -56,11 +60,14 @@ const firebaseQuery = {
 
 export function useFirebaseQueryCollection(
   collection: keyof Collections,
-  options: QueryConstraint[] = [],
+  options: QueryConstraint[] = []
 ) {
   return useQuery(firebaseQuery.getCollection(collection, options));
 }
 
-export function useFirebaseQueryDocument(collection: keyof Collections, id: string) {
+export function useFirebaseQueryDocument(
+  collection: keyof Collections,
+  id: string
+) {
   return useQuery(firebaseQuery.getDocument(collection, id));
 }

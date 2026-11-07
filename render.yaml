@@ -21,3 +21,4 @@ services:
       - key: VITE_FIREBASE_APP_ID
         sync: false
     autoDeploy: true
+    autoDeployTrigger: commit

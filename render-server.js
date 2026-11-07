@@ -52,7 +52,8 @@ function tryServeStatic(req, res, url) {
   const stats = statSync(filePath);
   if (!stats.isFile()) return false;
 
-  const type = MIME_TYPES[extname(filePath).toLowerCase()] || "application/octet-stream";
+  const type =
+    MIME_TYPES[extname(filePath).toLowerCase()] || "application/octet-stream";
   res.statusCode = 200;
   res.setHeader("Content-Type", type);
   res.setHeader("Content-Length", String(stats.size));
@@ -74,7 +75,7 @@ async function start() {
   } catch (err) {
     console.error(
       "Failed to load dist/server/server.js. Is the build complete?",
-      err,
+      err
     );
     process.exit(1);
   }

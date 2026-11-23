@@ -14,6 +14,15 @@ export default defineConfig(({ mode }) => {
 
   return {
     define: envDefine,
+    environments: {
+      ssr: {
+        build: {
+          rollupOptions: {
+            input: "./server.ts",
+          },
+        },
+      },
+    },
     resolve: {
       alias: {
         "@": `${process.cwd()}/src`,

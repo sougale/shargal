@@ -9,104 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WalletRouteImport } from './routes/wallet'
-import { Route as SellRouteImport } from './routes/sell'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as NotificationsRouteImport } from './routes/notifications'
-import { Route as ListingsRouteImport } from './routes/listings'
-import { Route as GenerateRouteImport } from './routes/generate'
-import { Route as GalleryRouteImport } from './routes/gallery'
-import { Route as FavouritesRouteImport } from './routes/favourites'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ConnectRouteImport } from './routes/connect'
-import { Route as CartRouteImport } from './routes/cart'
-import { Route as BidsRouteImport } from './routes/bids'
-import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
-import { Route as AuctionsIndexRouteImport } from './routes/auctions.index'
-import { Route as ArtistsIndexRouteImport } from './routes/artists.index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as BidsRouteImport } from './routes/bids'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as ConnectRouteImport } from './routes/connect'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FavouritesRouteImport } from './routes/favourites'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as GenerateRouteImport } from './routes/generate'
+import { Route as ListingsRouteImport } from './routes/listings'
+import { Route as NotificationsRouteImport } from './routes/notifications'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as SellRouteImport } from './routes/sell'
+import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as WalletWithdrawRouteImport } from './routes/wallet.withdraw'
-import { Route as WalletSendRouteImport } from './routes/wallet.send'
-import { Route as WalletSecurityRouteImport } from './routes/wallet.security'
-import { Route as WalletDepositRouteImport } from './routes/wallet.deposit'
-import { Route as WalletActivityRouteImport } from './routes/wallet.activity'
-import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
-import { Route as AuctionsMineRouteImport } from './routes/auctions.mine'
-import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
-import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
-import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
-import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
-import { Route as AdminExhibitionRouteImport } from './routes/admin.exhibition'
 import { Route as AdminAccountRouteImport } from './routes/admin.account'
+import { Route as AdminExhibitionRouteImport } from './routes/admin.exhibition'
+import { Route as AdminWalletRouteImport } from './routes/admin.wallet'
+import { Route as ArtistsIndexRouteImport } from './routes/artists.index'
+import { Route as ArtistsSlugRouteImport } from './routes/artists.$slug'
+import { Route as ArtworksSlugRouteImport } from './routes/artworks.$slug'
+import { Route as AuctionsIndexRouteImport } from './routes/auctions.index'
+import { Route as AuctionsSlugRouteImport } from './routes/auctions.$slug'
+import { Route as AuctionsMineRouteImport } from './routes/auctions.mine'
+import { Route as CategoriesIndexRouteImport } from './routes/categories.index'
+import { Route as CategoriesSlugRouteImport } from './routes/categories.$slug'
+import { Route as WalletActivityRouteImport } from './routes/wallet.activity'
+import { Route as WalletDepositRouteImport } from './routes/wallet.deposit'
+import { Route as WalletSecurityRouteImport } from './routes/wallet.security'
+import { Route as WalletSendRouteImport } from './routes/wallet.send'
+import { Route as WalletWithdrawRouteImport } from './routes/wallet.withdraw'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin.users.index'
 import { Route as AdminUsersIdRouteImport } from './routes/admin.users.$id'
 
-const WalletRoute = WalletRouteImport.update({
-  id: '/wallet',
-  path: '/wallet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SellRoute = SellRouteImport.update({
-  id: '/sell',
-  path: '/sell',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const NotificationsRoute = NotificationsRouteImport.update({
-  id: '/notifications',
-  path: '/notifications',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ListingsRoute = ListingsRouteImport.update({
-  id: '/listings',
-  path: '/listings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenerateRoute = GenerateRouteImport.update({
-  id: '/generate',
-  path: '/generate',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GalleryRoute = GalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FavouritesRoute = FavouritesRouteImport.update({
-  id: '/favourites',
-  path: '/favourites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ConnectRoute = ConnectRouteImport.update({
-  id: '/connect',
-  path: '/connect',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CartRoute = CartRouteImport.update({
-  id: '/cart',
-  path: '/cart',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BidsRoute = BidsRouteImport.update({
-  id: '/bids',
-  path: '/bids',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -114,24 +54,69 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
-  id: '/categories/',
-  path: '/categories/',
+const BidsRoute = BidsRouteImport.update({
+  id: '/bids',
+  path: '/bids',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuctionsIndexRoute = AuctionsIndexRouteImport.update({
-  id: '/auctions/',
-  path: '/auctions/',
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ArtistsIndexRoute = ArtistsIndexRouteImport.update({
-  id: '/artists/',
-  path: '/artists/',
+const ConnectRoute = ConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FavouritesRoute = FavouritesRouteImport.update({
+  id: '/favourites',
+  path: '/favourites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateRoute = GenerateRouteImport.update({
+  id: '/generate',
+  path: '/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListingsRoute = ListingsRouteImport.update({
+  id: '/listings',
+  path: '/listings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellRoute = SellRouteImport.update({
+  id: '/sell',
+  path: '/sell',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletRoute = WalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -139,59 +124,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const WalletWithdrawRoute = WalletWithdrawRouteImport.update({
-  id: '/withdraw',
-  path: '/withdraw',
-  getParentRoute: () => WalletRoute,
-} as any)
-const WalletSendRoute = WalletSendRouteImport.update({
-  id: '/send',
-  path: '/send',
-  getParentRoute: () => WalletRoute,
-} as any)
-const WalletSecurityRoute = WalletSecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => WalletRoute,
-} as any)
-const WalletDepositRoute = WalletDepositRouteImport.update({
-  id: '/deposit',
-  path: '/deposit',
-  getParentRoute: () => WalletRoute,
-} as any)
-const WalletActivityRoute = WalletActivityRouteImport.update({
-  id: '/activity',
-  path: '/activity',
-  getParentRoute: () => WalletRoute,
-} as any)
-const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
-  id: '/categories/$slug',
-  path: '/categories/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuctionsMineRoute = AuctionsMineRouteImport.update({
-  id: '/auctions/mine',
-  path: '/auctions/mine',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuctionsSlugRoute = AuctionsSlugRouteImport.update({
-  id: '/auctions/$slug',
-  path: '/auctions/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArtworksSlugRoute = ArtworksSlugRouteImport.update({
-  id: '/artworks/$slug',
-  path: '/artworks/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ArtistsSlugRoute = ArtistsSlugRouteImport.update({
-  id: '/artists/$slug',
-  path: '/artists/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminWalletRoute = AdminWalletRouteImport.update({
-  id: '/wallet',
-  path: '/wallet',
+const AdminAccountRoute = AdminAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminExhibitionRoute = AdminExhibitionRouteImport.update({
@@ -199,10 +134,75 @@ const AdminExhibitionRoute = AdminExhibitionRouteImport.update({
   path: '/exhibition',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAccountRoute = AdminAccountRouteImport.update({
-  id: '/account',
-  path: '/account',
+const AdminWalletRoute = AdminWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
   getParentRoute: () => AdminRoute,
+} as any)
+const ArtistsIndexRoute = ArtistsIndexRouteImport.update({
+  id: '/artists/',
+  path: '/artists/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtistsSlugRoute = ArtistsSlugRouteImport.update({
+  id: '/artists/$slug',
+  path: '/artists/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArtworksSlugRoute = ArtworksSlugRouteImport.update({
+  id: '/artworks/$slug',
+  path: '/artworks/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuctionsIndexRoute = AuctionsIndexRouteImport.update({
+  id: '/auctions/',
+  path: '/auctions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuctionsSlugRoute = AuctionsSlugRouteImport.update({
+  id: '/auctions/$slug',
+  path: '/auctions/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuctionsMineRoute = AuctionsMineRouteImport.update({
+  id: '/auctions/mine',
+  path: '/auctions/mine',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesIndexRoute = CategoriesIndexRouteImport.update({
+  id: '/categories/',
+  path: '/categories/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriesSlugRoute = CategoriesSlugRouteImport.update({
+  id: '/categories/$slug',
+  path: '/categories/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WalletActivityRoute = WalletActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletDepositRoute = WalletDepositRouteImport.update({
+  id: '/deposit',
+  path: '/deposit',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletSecurityRoute = WalletSecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletSendRoute = WalletSendRouteImport.update({
+  id: '/send',
+  path: '/send',
+  getParentRoute: () => WalletRoute,
+} as any)
+const WalletWithdrawRoute = WalletWithdrawRouteImport.update({
+  id: '/withdraw',
+  path: '/withdraw',
+  getParentRoute: () => WalletRoute,
 } as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   id: '/users/',
@@ -461,95 +461,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wallet': {
-      id: '/wallet'
-      path: '/wallet'
-      fullPath: '/wallet'
-      preLoaderRoute: typeof WalletRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sell': {
-      id: '/sell'
-      path: '/sell'
-      fullPath: '/sell'
-      preLoaderRoute: typeof SellRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/notifications': {
-      id: '/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof NotificationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/listings': {
-      id: '/listings'
-      path: '/listings'
-      fullPath: '/listings'
-      preLoaderRoute: typeof ListingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/generate': {
-      id: '/generate'
-      path: '/generate'
-      fullPath: '/generate'
-      preLoaderRoute: typeof GenerateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/favourites': {
-      id: '/favourites'
-      path: '/favourites'
-      fullPath: '/favourites'
-      preLoaderRoute: typeof FavouritesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/connect': {
-      id: '/connect'
-      path: '/connect'
-      fullPath: '/connect'
-      preLoaderRoute: typeof ConnectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cart': {
-      id: '/cart'
-      path: '/cart'
-      fullPath: '/cart'
-      preLoaderRoute: typeof CartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bids': {
-      id: '/bids'
-      path: '/bids'
-      fullPath: '/bids'
-      preLoaderRoute: typeof BidsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -559,32 +475,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/categories/': {
-      id: '/categories/'
-      path: '/categories'
-      fullPath: '/categories/'
-      preLoaderRoute: typeof CategoriesIndexRouteImport
+    '/bids': {
+      id: '/bids'
+      path: '/bids'
+      fullPath: '/bids'
+      preLoaderRoute: typeof BidsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auctions/': {
-      id: '/auctions/'
-      path: '/auctions'
-      fullPath: '/auctions/'
-      preLoaderRoute: typeof AuctionsIndexRouteImport
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/artists/': {
-      id: '/artists/'
-      path: '/artists'
-      fullPath: '/artists/'
-      preLoaderRoute: typeof ArtistsIndexRouteImport
+    '/connect': {
+      id: '/connect'
+      path: '/connect'
+      fullPath: '/connect'
+      preLoaderRoute: typeof ConnectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/favourites': {
+      id: '/favourites'
+      path: '/favourites'
+      fullPath: '/favourites'
+      preLoaderRoute: typeof FavouritesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate': {
+      id: '/generate'
+      path: '/generate'
+      fullPath: '/generate'
+      preLoaderRoute: typeof GenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listings': {
+      id: '/listings'
+      path: '/listings'
+      fullPath: '/listings'
+      preLoaderRoute: typeof ListingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sell': {
+      id: '/sell'
+      path: '/sell'
+      fullPath: '/sell'
+      preLoaderRoute: typeof SellRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet': {
+      id: '/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof WalletRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -594,81 +573,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/wallet/withdraw': {
-      id: '/wallet/withdraw'
-      path: '/withdraw'
-      fullPath: '/wallet/withdraw'
-      preLoaderRoute: typeof WalletWithdrawRouteImport
-      parentRoute: typeof WalletRoute
-    }
-    '/wallet/send': {
-      id: '/wallet/send'
-      path: '/send'
-      fullPath: '/wallet/send'
-      preLoaderRoute: typeof WalletSendRouteImport
-      parentRoute: typeof WalletRoute
-    }
-    '/wallet/security': {
-      id: '/wallet/security'
-      path: '/security'
-      fullPath: '/wallet/security'
-      preLoaderRoute: typeof WalletSecurityRouteImport
-      parentRoute: typeof WalletRoute
-    }
-    '/wallet/deposit': {
-      id: '/wallet/deposit'
-      path: '/deposit'
-      fullPath: '/wallet/deposit'
-      preLoaderRoute: typeof WalletDepositRouteImport
-      parentRoute: typeof WalletRoute
-    }
-    '/wallet/activity': {
-      id: '/wallet/activity'
-      path: '/activity'
-      fullPath: '/wallet/activity'
-      preLoaderRoute: typeof WalletActivityRouteImport
-      parentRoute: typeof WalletRoute
-    }
-    '/categories/$slug': {
-      id: '/categories/$slug'
-      path: '/categories/$slug'
-      fullPath: '/categories/$slug'
-      preLoaderRoute: typeof CategoriesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auctions/mine': {
-      id: '/auctions/mine'
-      path: '/auctions/mine'
-      fullPath: '/auctions/mine'
-      preLoaderRoute: typeof AuctionsMineRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auctions/$slug': {
-      id: '/auctions/$slug'
-      path: '/auctions/$slug'
-      fullPath: '/auctions/$slug'
-      preLoaderRoute: typeof AuctionsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/artworks/$slug': {
-      id: '/artworks/$slug'
-      path: '/artworks/$slug'
-      fullPath: '/artworks/$slug'
-      preLoaderRoute: typeof ArtworksSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/artists/$slug': {
-      id: '/artists/$slug'
-      path: '/artists/$slug'
-      fullPath: '/artists/$slug'
-      preLoaderRoute: typeof ArtistsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/wallet': {
-      id: '/admin/wallet'
-      path: '/wallet'
-      fullPath: '/admin/wallet'
-      preLoaderRoute: typeof AdminWalletRouteImport
+    '/admin/account': {
+      id: '/admin/account'
+      path: '/account'
+      fullPath: '/admin/account'
+      preLoaderRoute: typeof AdminAccountRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/exhibition': {
@@ -678,12 +587,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminExhibitionRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/account': {
-      id: '/admin/account'
-      path: '/account'
-      fullPath: '/admin/account'
-      preLoaderRoute: typeof AdminAccountRouteImport
+    '/admin/wallet': {
+      id: '/admin/wallet'
+      path: '/wallet'
+      fullPath: '/admin/wallet'
+      preLoaderRoute: typeof AdminWalletRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/artists/': {
+      id: '/artists/'
+      path: '/artists'
+      fullPath: '/artists/'
+      preLoaderRoute: typeof ArtistsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artists/$slug': {
+      id: '/artists/$slug'
+      path: '/artists/$slug'
+      fullPath: '/artists/$slug'
+      preLoaderRoute: typeof ArtistsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/artworks/$slug': {
+      id: '/artworks/$slug'
+      path: '/artworks/$slug'
+      fullPath: '/artworks/$slug'
+      preLoaderRoute: typeof ArtworksSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auctions/': {
+      id: '/auctions/'
+      path: '/auctions'
+      fullPath: '/auctions/'
+      preLoaderRoute: typeof AuctionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auctions/$slug': {
+      id: '/auctions/$slug'
+      path: '/auctions/$slug'
+      fullPath: '/auctions/$slug'
+      preLoaderRoute: typeof AuctionsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auctions/mine': {
+      id: '/auctions/mine'
+      path: '/auctions/mine'
+      fullPath: '/auctions/mine'
+      preLoaderRoute: typeof AuctionsMineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/': {
+      id: '/categories/'
+      path: '/categories'
+      fullPath: '/categories/'
+      preLoaderRoute: typeof CategoriesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categories/$slug': {
+      id: '/categories/$slug'
+      path: '/categories/$slug'
+      fullPath: '/categories/$slug'
+      preLoaderRoute: typeof CategoriesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wallet/activity': {
+      id: '/wallet/activity'
+      path: '/activity'
+      fullPath: '/wallet/activity'
+      preLoaderRoute: typeof WalletActivityRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/deposit': {
+      id: '/wallet/deposit'
+      path: '/deposit'
+      fullPath: '/wallet/deposit'
+      preLoaderRoute: typeof WalletDepositRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/security': {
+      id: '/wallet/security'
+      path: '/security'
+      fullPath: '/wallet/security'
+      preLoaderRoute: typeof WalletSecurityRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/send': {
+      id: '/wallet/send'
+      path: '/send'
+      fullPath: '/wallet/send'
+      preLoaderRoute: typeof WalletSendRouteImport
+      parentRoute: typeof WalletRoute
+    }
+    '/wallet/withdraw': {
+      id: '/wallet/withdraw'
+      path: '/withdraw'
+      fullPath: '/wallet/withdraw'
+      preLoaderRoute: typeof WalletWithdrawRouteImport
+      parentRoute: typeof WalletRoute
     }
     '/admin/users/': {
       id: '/admin/users/'

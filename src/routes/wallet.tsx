@@ -1,4 +1,9 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  useRouterState,
+} from "@tanstack/react-router";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
@@ -24,6 +29,7 @@ import { TxRow } from "@/components/wallet/TxRow";
 import { formatMoney } from "@/utils";
 import { useAuthStore, useDataStore } from "@/store/zustand";
 import { txSign } from "@/lib/wallet";
+import { useMetArtworks } from "@/hooks/useMetArtWork";
 export const Route = createFileRoute("/wallet")({
   component: WalletDashboard,
   head: () => ({ meta: [{ title: "EmberPay — Sharjahbiennial Wallet" }] }),
@@ -44,6 +50,8 @@ function Dashboard() {
   if (!currentAccount) return null;
 
   const txs = useDataStore((s) => s.transactions);
+  const auctions = useDataStore((s) => s.auctions);
+  const met = useMetArtworks();
 
   const stats = useMemo(() => {
     let deposited = 0;
@@ -73,7 +81,10 @@ function Dashboard() {
         transition={{ duration: 0.45, ease: "easeOut" }}
         className="relative z-20 !overflow-hidden rounded-[2rem] border border-[var(--w-border)] bg-[var(--w-surface)] p-7 shadow-2xl wallet-ring md:p-9"
       >
-        <div className="absolute inset-0 wallet-dotgrid opacity-30" aria-hidden />
+        <div
+          className="absolute inset-0 wallet-dotgrid opacity-30"
+          aria-hidden
+        />
         {/* orange corner accent */}
         <div
           className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full opacity-40 blur-3xl"
@@ -84,7 +95,8 @@ function Dashboard() {
         <div className="relative flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--w-muted)]">
-              <span className="size-1.5 rounded-full wallet-live-dot" /> Total balance
+              <span className="size-1.5 rounded-full wallet-live-dot" /> Total
+              balance
             </p>
             <motion.button
               onClick={() => setShowBal((v) => !v)}
@@ -93,13 +105,21 @@ function Dashboard() {
             >
               <span className="text-3xl font-extrabold tracking-tight text-[var(--w-fg)] md:text-4xl">
                 {showBal
-                  ? formatMoney(currentAccount.wallet.balance, currentAccount?.currency, {
-                      withSymbol: true,
-                    })
+                  ? formatMoney(
+                      currentAccount.wallet.balance,
+                      currentAccount?.currency,
+                      {
+                        withSymbol: true,
+                      }
+                    )
                   : "••••••"}
               </span>
               <span className="grid size-9 place-items-center rounded-full border border-[var(--w-border)] bg-[var(--w-bg-2)] text-[var(--w-muted)]">
-                {showBal ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
+                {showBal ? (
+                  <EyeOff className="size-3.5" />
+                ) : (
+                  <Eye className="size-3.5" />
+                )}
               </span>
             </motion.button>
             <p className="mt-2 flex items-center gap-2 text-xs text-[var(--w-muted)]">
@@ -113,7 +133,11 @@ function Dashboard() {
               24h
             </p>
             <p className="mt-1 text-sm font-extrabold text-[var(--w-brand)]">
-              ▲ {formatMoney(Math.max(stats.deposited - stats.spent, 0), currentAccount?.currency)}
+              ▲{" "}
+              {formatMoney(
+                Math.max(stats.deposited - stats.spent, 0),
+                currentAccount?.currency
+              )}
             </p>
           </div>
         </div>
@@ -135,9 +159,16 @@ function Dashboard() {
           </div>
           <span
             className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider"
-            style={{ background: "var(--w-brand)", color: "var(--w-brand-contrast)" }}
+            style={{
+              background: "var(--w-brand)",
+              color: "var(--w-brand-contrast)",
+            }}
           >
-            {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+            {copied ? (
+              <Check className="size-3" />
+            ) : (
+              <Copy className="size-3" />
+            )}
             {copied ? "Copied" : "Copy"}
           </span>
         </motion.button>
@@ -145,7 +176,11 @@ function Dashboard() {
         {/* Action row */}
         <div className="relative mt-5 grid grid-cols-4 gap-2">
           <Action to="/wallet/deposit" icon={ArrowDownToLine} label="Deposit" />
-          <Action to="/wallet/withdraw" icon={ArrowUpFromLine} label="Withdraw" />
+          <Action
+            to="/wallet/withdraw"
+            icon={ArrowUpFromLine}
+            label="Withdraw"
+          />
           <Action to="/wallet/send" icon={Send} label="Send" />
           <Action to="/wallet/activity" icon={Repeat2} label="History" />
         </div>
@@ -181,13 +216,13 @@ function Dashboard() {
         <DiscoverCard
           icon={Gavel}
           title="Live auctions"
-          desc="3 lots closing tonight"
+          desc={`${auctions.length ? `${auctions.length}` : "None"} available the moment, ${auctions.length ? "go place your bid now" : "upload your work of art, let's bid it out."}`}
           href="/auctions"
         />
         <DiscoverCard
           icon={Palette}
           title="New artworks"
-          desc="42 fresh on the wall"
+          desc={`Check out our gallery for new arkworks.`}
           href="/gallery"
         />
         <DiscoverCard
@@ -234,7 +269,15 @@ function Dashboard() {
   );
 }
 
-function Action({ to, icon: Icon, label }: { to: string; icon: typeof Send; label: string }) {
+function Action({
+  to,
+  icon: Icon,
+  label,
+}: {
+  to: string;
+  icon: typeof Send;
+  label: string;
+}) {
   return (
     <Link to={to} className="group">
       <motion.div
@@ -324,7 +367,10 @@ function DiscoverCard({
             className="grid size-9 place-items-center rounded-[1rem]"
             style={
               accent
-                ? { background: "var(--w-brand)", color: "var(--w-brand-contrast)" }
+                ? {
+                    background: "var(--w-brand)",
+                    color: "var(--w-brand-contrast)",
+                  }
                 : { background: "var(--w-bg-2)", color: "var(--w-brand)" }
             }
           >
@@ -332,7 +378,9 @@ function DiscoverCard({
           </span>
           <ArrowUpRight className="size-4 text-[var(--w-muted)]" />
         </div>
-        <p className="mt-3 text-sm font-extrabold tracking-tight text-[var(--w-fg)]">{title}</p>
+        <p className="mt-3 text-sm font-extrabold tracking-tight text-[var(--w-fg)]">
+          {title}
+        </p>
         <p className="text-xs text-[var(--w-muted)]">{desc}</p>
       </motion.div>
     </Link>

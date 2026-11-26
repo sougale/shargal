@@ -25,6 +25,7 @@ import artist02 from "@/assets/artist-02.jpg";
 import art10 from "@/assets/art-10.jpg";
 import { useAuthStore } from "@/store/zustand";
 import { NotificationBell } from "./NotificationBell";
+import face from "@/assets/art-04.jpg";
 
 type PanelKey = "categories" | "artists" | "about" | null;
 
@@ -111,13 +112,17 @@ export function MegaNav() {
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5">
         <Link
           to="/"
-          className="font-display text-2xl italic tracking-tight text-ink"
+          className="font-display text-2xl italic tracking-tight text-ink flex flex-col gap-1 items-center"
           onClick={() => {
             setMobileOpen(false);
             closeNow();
           }}
         >
-          Sharjahbiennial
+          <img
+            src={face}
+            className="block size-7 rounded-full bg-blend-lighten shadow-md shadow-surface"
+          />
+          <p className="text-xs italic">Sharjahbiennial</p>
         </Link>
 
         <nav className="hidden items-center gap-9 md:flex ">
@@ -337,7 +342,7 @@ export function MegaNav() {
                 onClick={() => setMobileOpen(false)}
                 className="font-display text-2xl italic tracking-tight text-ink"
               >
-                sharjahbiennial
+                Sharjahbiennial
               </Link>
               <button
                 type="button"

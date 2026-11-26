@@ -249,7 +249,7 @@ function RootComponent() {
                 <ArtWorkProvider>
                   <div className="flex min-h-screen flex-col bg-canvas">
                     <MegaNav />
-                    <main className="flex-1">
+                    <main className="flex-1 grow">
                       <PageTransition>
                         <Outlet />
                       </PageTransition>

@@ -4,7 +4,11 @@
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { metQueries } from "@/queries";
 import { metApi } from "../services/metApi";
-import type { MetArtwork, MetArtistProfile, UseArtistReturn } from "../types/metTypes";
+import type {
+  MetArtwork,
+  MetArtistProfile,
+  UseArtistReturn,
+} from "../types/metTypes";
 
 const PAGE_SIZE = 12;
 
@@ -14,7 +18,9 @@ const PAGE_SIZE = 12;
  * - Artist profile + first page uses useQuery
  * - Additional pages use useInfiniteQuery (recommended for lists)
  */
-export function useMetArtist(artistName: string = "Vincent van Gogh"): UseArtistReturn {
+export function useMetArtist(
+  artistName: string = "Vincent van Gogh"
+): UseArtistReturn {
   const trimmed = artistName.trim();
 
   // Main artist data (profile + first batch)
@@ -27,7 +33,9 @@ export function useMetArtist(artistName: string = "Vincent van Gogh"): UseArtist
   const infiniteQuery = useInfiniteQuery({
     queryKey: ["met", "artist", trimmed, "infinite"],
     queryFn: async ({ pageParam = 0 }) => {
-      const { objectIDs } = await metApi.searchByArtist(trimmed, { hasImages: true });
+      const { objectIDs } = await metApi.searchByArtist(trimmed, {
+        hasImages: true,
+      });
       if (!objectIDs?.length) return [];
 
       const start = pageParam * PAGE_SIZE;
@@ -65,7 +73,9 @@ export function useMetArtist(artistName: string = "Vincent van Gogh"): UseArtist
   const fetchForArtist = (name: string) => {
     // TanStack Query will refetch automatically when the key changes
     // This function is kept for API compatibility
-    console.log("[useMetArtist] fetchForArtist called — query will auto-refetch on param change");
+    console.log(
+      "[useMetArtist] fetchForArtist called — query will auto-refetch on param change"
+    );
   };
 
   // Build a simple artist profile from current data
